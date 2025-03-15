@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, ProfileSerializer
-from .models import Profile
+from .models import UserProfile as Profile
 
 class UserRegistrationView(APIView):
     def post(self, request):
