@@ -10,6 +10,7 @@ import Signup from "./components/Signup";
 import { StockDetail } from "./components/StockDetail";
 import PrivateRoute from "./components/PrivateRoute"; 
 import Logout from "./components/Logout";
+import { BondDetail } from "./components/BondDetail";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="stock/:symbol" element={<StockDetail />} />
+        <Route path="bond/:symbol" element={<BondDetail />} />
         <Route path="/logout" element={<Logout />} />
 
         {/* Protected routes wrapped inside Layout */}

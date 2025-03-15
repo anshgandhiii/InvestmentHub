@@ -5,6 +5,33 @@ import { TradePanel } from "./TradePanel";
 import InvestmentSuggestions from "./InvestmentSuggessions"
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
+import stockData from "../stocks.json"; // Import stocks.json for current prices
+import { Line, Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  Filler,
+} from "chart.js";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  Filler
+);
 import stockData from "../stocks.json"; 
 import { FaCoins } from "react-icons/fa";
 
@@ -132,6 +159,97 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [loading, portfolioData, profile]);
 
+  // Simulated portfolio performance data (replace with real data later)
+  const performanceData = {
+    labels: ["Jan 2025", "Feb 2025", "Mar 2025"],
+    datasets: [
+      {
+        label: "Portfolio Value",
+        data: [10000, 10500, 11000], // Simulated growth
+        fill: true,
+        backgroundColor: "rgba(79, 70, 229, 0.2)", // Indigo fill
+        borderColor: "rgba(79, 70, 229, 1)", // Indigo line
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 3,
+      },
+    ],
+  };
+
+  // Simulated allocation data (replace with real data later)
+  const allocationData = {
+    labels: ["Stocks", "Bonds", "Insurance"],
+    datasets: [
+      {
+        data: [60, 30, 10], // Simulated percentages
+        backgroundColor: ["#4F46E5", "#10B981", "#F59E0B"], // Indigo, Emerald, Amber
+        borderWidth: 1,
+        borderColor: "#fff",
+      },
+    ],
+  };
+
+  // Chart options
+  const performanceOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        mode: "index",
+        intersect: false,
+        callbacks: {
+          label: (context) => `₹${context.parsed.y.toLocaleString("en-US")}`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          maxTicksLimit: 5,
+        },
+      },
+      y: {
+        grid: {
+          color: "rgba(0, 0, 0, 0.05)",
+        },
+        ticks: {
+          callback: (value) => `₹${value.toLocaleString("en-US")}`,
+        },
+      },
+    },
+  };
+
+  const allocationOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          generateLabels: (chart) => {
+            const data = chart.data;
+            return data.labels.map((label, i) => ({
+              text: `${label}: ${data.datasets[0].data[i]}%`,
+              fillStyle: data.datasets[0].backgroundColor[i],
+            }));
+          },
+        },
+      },
+    },
+  };
+
+  // Handle Add Funds button click
+  const handleAddFunds = () => {
+    alert("Redirecting to payment gateway to add funds...");
+    // Replace with actual payment gateway integration
+  };
+
   if (loading) {
     return <div className="text-center p-6">Loading dashboard...</div>;
   }
@@ -182,6 +300,13 @@ export default function Dashboard() {
           <>
             <div className="card bg-base-100 shadow-md p-4">
               <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Account Balance</h3>
+                <button
+                  className="btn btn-sm btn-outline btn-primary"
+                  onClick={handleAddFunds}
+                >
+                  Add Funds
+                </button>
               <h3 className="text-lg font-semibold flex items-center">
                   <FaCoins className="mr-2" />
                   Account Balance
@@ -189,7 +314,12 @@ export default function Dashboard() {
                 <button className="btn btn-sm btn-outline">Add Funds</button>
               </div>
               <p className="text-xl font-bold">
-                ₹{profile.balance ? parseFloat(profile.balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+                ₹{profile.balance
+                  ? parseFloat(profile.balance).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : "0.00"}
               </p>
               <p className="text-gray-500 text-sm">Last deposit: ₹2,000 on Mar 10, 2025</p>
             </div>
@@ -198,16 +328,16 @@ export default function Dashboard() {
                 <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   <FaChartLine className="text-indigo-500" /> Performance
                 </h2>
-                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4 flex items-center justify-center">
-                  <FaChartLine className="h-16 w-16 text-indigo-300" />
+                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4">
+                  <Line data={performanceData} options={performanceOptions} />
                 </div>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-md">
                 <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   <FaChartPie className="text-indigo-500" /> Allocation
                 </h2>
-                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4 flex items-center justify-center">
-                  <FaChartPie className="h-16 w-16 text-indigo-300" />
+                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4">
+                  <Pie data={allocationData} options={allocationOptions} />
                 </div>
               </div>
             </div>
