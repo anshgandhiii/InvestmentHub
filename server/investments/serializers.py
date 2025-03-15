@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Asset, Portfolio, Transaction
+from .models import UserProfile
 
 class AssetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,9 +9,10 @@ class AssetSerializer(serializers.ModelSerializer):
 
 class PortfolioSerializer(serializers.ModelSerializer):
     asset = AssetSerializer()
+    user_profile = serializers.PrimaryKeyRelatedField(queryset=UserProfile)
     class Meta:
         model = Portfolio
-        fields = ['id', 'asset', 'quantity', 'purchase_date']
+        fields = ['id', 'user_profile', 'asset', 'quantity', 'purchase_date']
 
 class TransactionSerializer(serializers.ModelSerializer):
     asset = AssetSerializer()

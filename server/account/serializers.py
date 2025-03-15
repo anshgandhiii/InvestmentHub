@@ -23,4 +23,4 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['user', 'balance', 'risk_tolerance', 'email', 'boughtsum']
+        fields = ['user', 'balance', 'risk_tolerance', 'email', 'boughtsum', 'stocks', 'bonds', 'insurance']

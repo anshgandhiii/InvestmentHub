@@ -28,18 +28,18 @@ export default function Dashboard() {
 
         // Calculate current portfolio values
         const totalPortfolio = portfolioData.reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const stocksValue = portfolioData
-          .filter((item) => item.asset.type === "stock")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const bondsValue = portfolioData
-          .filter((item) => item.asset.type === "bond")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const insuranceValue = portfolioData
-          .filter((item) => item.asset.type === "insurance")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const sipValue = portfolioData
-          .filter((item) => item.asset.type === "sip")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
+        // const stocksValue = portfolioData
+        //   .filter((item) => item.asset.type === "stock")
+        //   .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
+        // const bondsValue = portfolioData
+        //   .filter((item) => item.asset.type === "bond")
+        //   .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
+        // const insuranceValue = portfolioData
+        //   .filter((item) => item.asset.type === "insurance")
+        //   .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
+        const stocksValue = parseFloat(profileData.stocks) || 0;
+        const bondsValue = parseFloat(profileData.bonds) || 0;
+        const insuranceValue = parseFloat(profileData.insurance) || 0;
 
         // Use boughtsum as the initial investment for trend calculation
         const boughtsum = parseFloat(profileData.boughtsum) || 0;
@@ -56,9 +56,9 @@ export default function Dashboard() {
 
         // Assume initial allocation proportions if boughtsum is non-zero (simplified)
         const portfolioTrend = calculateTrend(totalPortfolio, boughtsum);
-        const stocksTrend = calculateTrend(stocksValue, boughtsum * 0.6); // 60% initial allocation assumption
-        const bondsTrend = calculateTrend(bondsValue, boughtsum * 0.3);  // 30% initial allocation assumption
-        const insuranceTrend = calculateTrend(insuranceValue, boughtsum * 0.1); // 10% initial allocation assumption
+        // const stocksTrend = calculateTrend(stocksValue, boughtsum * 0.6); // 60% initial allocation assumption
+        // const bondsTrend = calculateTrend(bondsValue, boughtsum * 0.3);  // 30% initial allocation assumption
+        // const insuranceTrend = calculateTrend(insuranceValue, boughtsum * 0.1); // 10% initial allocation assumption
 
         const summary = [
           {
@@ -77,37 +77,37 @@ export default function Dashboard() {
             title: "Stocks",
             value: `$${stocksValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             icon: <FaChartLine className="h-6 w-6 text-indigo-500" />,
-            trend: stocksTrend.percentage,
-            trendIcon: stocksTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : stocksTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: stocksTrend.direction === "up" ? "bg-green-100 text-green-600" : stocksTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+            // // trend: stocksTrend.percentage,
+            // // trendIcon: stocksTrend.direction === "up" ? (
+            //   <FaArrowUp className="h-4 w-4 text-green-500" />
+            // ) : stocksTrend.direction === "down" ? (
+            //   <FaArrowDown className="h-4 w-4 text-red-500" />
+            // ) : null,
+            // trendColor: stocksTrend.direction === "up" ? "bg-green-100 text-green-600" : stocksTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
           },
           {
             title: "Bonds",
             value: `$${bondsValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             icon: <FaChartBar className="h-6 w-6 text-indigo-500" />,
-            trend: bondsTrend.percentage,
-            trendIcon: bondsTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : bondsTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: bondsTrend.direction === "up" ? "bg-green-100 text-green-600" : bondsTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+            // trend: bondsTrend.percentage,
+            // trendIcon: bondsTrend.direction === "up" ? (
+            //   <FaArrowUp className="h-4 w-4 text-green-500" />
+            // ) : bondsTrend.direction === "down" ? (
+            //   <FaArrowDown className="h-4 w-4 text-red-500" />
+            // ) : null,
+            // trendColor: bondsTrend.direction === "up" ? "bg-green-100 text-green-600" : bondsTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
           },
           {
             title: "Insurance",
             value: `$${insuranceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             icon: <FaChartPie className="h-6 w-6 text-indigo-500" />,
-            trend: insuranceTrend.percentage,
-            trendIcon: insuranceTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : insuranceTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: insuranceTrend.direction === "up" ? "bg-green-100 text-green-600" : insuranceTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+            // trend: insuranceTrend.percentage,
+            // trendIcon: insuranceTrend.direction === "up" ? (
+            //   <FaArrowUp className="h-4 w-4 text-green-500" />
+            // ) : insuranceTrend.direction === "down" ? (
+            //   <FaArrowDown className="h-4 w-4 text-red-500" />
+            // ) : null,
+            // trendColor: insuranceTrend.direction === "up" ? "bg-green-100 text-green-600" : insuranceTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
           },
         ];
 

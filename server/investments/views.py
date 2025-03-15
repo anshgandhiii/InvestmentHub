@@ -110,7 +110,7 @@ class PortfolioView(APIView):
         return Response(serializer.data)
 
 class TransactionView(APIView):
-    def get(self, request, id=None):  # Make id optional
+    def get(self, request, id=None):
         if not id:
             return Response({"error": "User ID is required for GET requests"}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -121,7 +121,7 @@ class TransactionView(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, id=None):  # id is not needed for POST
+    def post(self, request, id=None):
         user_id = request.data.get('user_id')
         if not user_id:
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -129,30 +129,50 @@ class TransactionView(APIView):
         try:
             profile = UserProfile.objects.get(user__id=user_id)
             asset = Asset.objects.get(id=request.data.get('asset_id'))
+            print("Profile:", profile, "Asset:", asset)
             quantity = int(request.data.get('quantity', 0))
+            print("Quantity:", quantity, "Type:", type(quantity))
             transaction_type = request.data.get('transaction_type')
-
+            print("Transaction Type:", transaction_type)
             if not all([asset, quantity, transaction_type]):
                 return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
 
             amount = asset.price * quantity
-
+            print("Amount:", amount, "Type:", type(amount))
+            
             if transaction_type == 'buy':
+                print("Entering buy logic")
                 if profile.balance < amount:
                     return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 profile.balance -= amount
                 profile.boughtsum += amount
+                if asset.asset_type == 'stock':
+                    profile.stocks += amount
+                elif asset.asset_type == 'bond':
+                    profile.bonds += amount
+                elif asset.asset_type == 'insurance':
+                    profile.insurance += amount
+                print("Before Portfolio create")
                 Portfolio.objects.update_or_create(
-                    user_profile=profile, asset=asset,
-                    defaults={'quantity': models.F('quantity') + quantity}
+                    user_profile=profile,  # Fixed: Use profile instance
+                    asset=asset,           # Fixed: Use asset instance
+                    quantity=quantity
                 )
+                print("After Portfolio create")
             elif transaction_type == 'sell':
+                print("Entering sell logic")
                 try:
                     portfolio = Portfolio.objects.get(user_profile=profile, asset=asset)
                     if portfolio.quantity < quantity:
                         return Response({"error": "Not enough assets to sell"}, status=status.HTTP_400_BAD_REQUEST)
                     profile.balance += amount
                     profile.boughtsum -= amount
+                    if asset.asset_type == 'stock':  # Fixed: Use asset.asset_type (not asset.type)
+                        profile.stocks -= amount
+                    elif asset.asset_type == 'bond':  # Fixed: Use asset.asset_type
+                        profile.bonds -= amount
+                    elif asset.asset_type == 'insurance':  # Fixed: Use asset.asset_type
+                        profile.insurance -= amount
                     portfolio.quantity -= quantity
                     if portfolio.quantity == 0:
                         portfolio.delete()
@@ -163,24 +183,28 @@ class TransactionView(APIView):
             else:
                 return Response({"error": "Invalid transaction_type"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if profile.boughtsum < 0:
-                profile.boughtsum = 0
-
+            print("Before profile save")
             profile.save()
+            print("After profile save")
+            print("Before Transaction create")
             transaction = Transaction.objects.create(
-                user_profile=profile, asset=asset, quantity=quantity,
-                transaction_type=transaction_type, amount=amount
+                user_profile=profile,  # Already correct
+                asset=asset,           # Already correct
+                quantity=quantity,
+                transaction_type=transaction_type,
+                amount=amount
             )
+            print("After Transaction create")
             serializer = TransactionSerializer(transaction)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         except UserProfile.DoesNotExist:
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Asset.DoesNotExist:
             return Response({"error": "Asset not found"}, status=status.HTTP_404_NOT_FOUND)
-        except ValueError:
+        except ValueError as e:
+            print("ValueError caught:", str(e))
             return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
-    
+        
 class SuggestionView(APIView):
     def get(self, request):
         user_id = request.headers.get('User-Id')
