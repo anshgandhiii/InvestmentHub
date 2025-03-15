@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
-import InvestmentSuggestions from "./InvestmentSuggessions"
 import SipCalculator from "./SipCalculator";
 import { FaCoins } from "react-icons/fa";
+import Learnings from "./Learnings";
 
-export default function Dashboard() {
+export default function VirtualMarket() {
   const [activeTab, setActiveTab] = useState("overview");
   const [portfolioSummary, setPortfolioSummary] = useState([]);
   const [profile, setProfile] = useState({});
@@ -121,7 +121,7 @@ export default function Dashboard() {
   }, [userId]);
 
   if (loading) {
-    return <div className="text-center p-6">Loading dashboard...</div>;
+    return <div className="text-center p-6">Loading VirtualMarket...</div>;
   }
 
   return (
@@ -149,7 +149,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "SIP"].map((tab) => (
+        {["overview", "trade", "learnings", "SIP"].map((tab) => (
           <button
             key={tab}
             className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -168,9 +168,9 @@ export default function Dashboard() {
           <>
             <div className="card bg-base-100 shadow-md p-4">
               <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold flex items-center">
+                <h3 className="text-lg font-semibold flex items-center">
                   <FaCoins className="mr-2" />
-                  Account Balance
+                  InvestHub Money
                 </h3>
                 <button className="btn btn-sm btn-outline">Add Funds</button>
               </div>
@@ -198,7 +198,7 @@ export default function Dashboard() {
           </>
         )}
         {activeTab === "trade" && <TradePanel />}
-        {activeTab === "suggestions" && <InvestmentSuggestions />}
+        {activeTab === "learnings" && <Learnings />}
         {activeTab === "SIP" && <SipCalculator />}
       </div>
     </div>

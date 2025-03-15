@@ -15,7 +15,7 @@ export function Layout() {
   const sidebarItems = [
     { label: "News", icon: <FaNewspaper className="h-5 w-5 text-indigo-500" />, path: "/news", active: true },
     { label: "History", icon: <FaHistory className="h-5 w-5 text-indigo-500" />, action: () => alert("Transaction History section coming soon!") },
-    { label: "Virtual Trading", icon: <FaGamepad className="h-5 w-5 text-indigo-500" />, action: () => alert("Virtual Trading section coming soon!") },
+    { label: "Virtual Trading", icon: <FaGamepad className="h-5 w-5 text-indigo-500" />, path: "/VirtualMarket", active: true },
   ];
 
   const newsItems = [
