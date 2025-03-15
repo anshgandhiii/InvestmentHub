@@ -2,7 +2,7 @@ from django.db import models
 from account.models import UserProfile
 
 class Asset(models.Model):
-    ASSET_TYPES = [('stock', 'Stock'), ('bond', 'Bond'), ('insurance', 'Insurance')]
+    ASSET_TYPES = [('stock', 'Stock'), ('bond', 'Bond'), ('insurance', 'Insurance'), ('sip', 'SIP')]    
     name = models.CharField(max_length=100)
     asset_type = models.CharField(max_length=10, choices=ASSET_TYPES)
     price = models.DecimalField(max_digits=10, decimal_places=2)

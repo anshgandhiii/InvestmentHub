@@ -18,16 +18,25 @@ class AssetListView(APIView):
         return Response(serializer.data)
 
 class PortfolioView(APIView):
-    def get(self, request):
-        user_id = request.headers.get('User-Id')  # Get user_id from headers
+    def get(self, request, id):
+        user_id = id  # Get user_id from headers
         profile = UserProfile.objects.get(user__id=user_id)
+        print(profile)
         portfolio = Portfolio.objects.filter(user_profile=profile)
+        print(portfolio)
         serializer = PortfolioSerializer(portfolio, many=True)
         return Response(serializer.data)
 
 class TransactionView(APIView):
+    def get(self, request, id):
+        user_id = id
+        profile = UserProfile.objects.get(user__id=user_id)
+        transactions = Transaction.objects.filter(user_profile=profile)
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
     def post(self, request):
-        user_id = request.data.get('user_id')  # Get user_id from POST data
+        user_id = request.data.get('user_id')
         profile = UserProfile.objects.get(user__id=user_id)
         asset = Asset.objects.get(id=request.data['asset_id'])
         quantity = int(request.data['quantity'])
@@ -60,7 +69,7 @@ class TransactionView(APIView):
         )
         serializer = TransactionSerializer(transaction)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+    
 class SuggestionView(APIView):
     def get(self, request):
         user_id = request.headers.get('User-Id')
