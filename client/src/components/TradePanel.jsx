@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaSearch, FaArrowUp, FaArrowDown, FaWallet } from "react-icons/fa";
-import stockData from "../../public/stocks.json"; // Ensure this path is correct
+import stockData from "../stocks.json"; // Ensure this path is correct
 
 export function TradePanel() {
   const [orderType, setOrderType] = useState("market");

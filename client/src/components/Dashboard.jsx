@@ -4,6 +4,8 @@ import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
 import { ProfitCalculator } from "./ProfitCalculator";
+import SipCalculator from "./SipCalculator"
+import { AccountBalance } from "./AccountBalance";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -161,7 +163,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "calculator"].map((tab) => (
+        {["overview", "trade", "suggestions", "SIP"].map((tab) => (
           <button
             key={tab}
             className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -208,7 +210,7 @@ export default function Dashboard() {
         )}
         {activeTab === "trade" && <TradePanel />}
         {activeTab === "suggestions" && <InvestmentSuggestions />}
-        {activeTab === "calculator" && <ProfitCalculator />}
+        {activeTab === "SIP" && <SipCalculator />}
       </div>
     </div>
   );
