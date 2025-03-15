@@ -72,8 +72,33 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "server.urls"
 
-CORS_ALLOW_ALL_ORIGINS = True  # For testing only
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your frontend origin (Vite default port)
+    "http://localhost:3000",  # If you switch to React’s default port
+]
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "user-id",  # Add your custom header here
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
 
 TEMPLATES = [
     {
