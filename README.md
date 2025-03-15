@@ -4,6 +4,8 @@ Frontend :
 
 npm i
 npm install react-icons
+npm install recharts
+npm install lucide-react
 
 
 Backend :
