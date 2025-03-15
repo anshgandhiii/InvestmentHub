@@ -25,16 +25,14 @@ class UserLoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(APIView):
-    def get(self, request):
-        user_id = request.query_params.get('user_id')  
-        if not user_id:
-            return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, id):  # Use 'id' instead of getting it from query parameters
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=id)
             profile, created = Profile.objects.get_or_create(user=user)  # Get or create profile
             serializer = ProfileSerializer(profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
