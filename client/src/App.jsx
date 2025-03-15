@@ -6,6 +6,7 @@ import Profile from "./components/Profile";
 import LandingPage from "./components/Landing";
 import Login from "./components/Login";
 import Signup from "./components/SIgnup";
+import { StockDetail } from "./components/StockDetail";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="stock/:symbol" element={<StockDetail />} />
       </Routes>
     </Router>
   );
