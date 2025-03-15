@@ -37,7 +37,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "calculator"].map((tab) => (
+        {["overview", "trade", "suggestions", "SIP"].map((tab) => (
           <button
             key={tab}
             className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -77,7 +77,7 @@ export default function Dashboard() {
         )}
         {activeTab === "trade" && <TradePanel />}
         {activeTab === "suggestions" && <InvestmentSuggestions />}
-        {activeTab === "calculator" && <SipCalculator />}
+        {activeTab === "SIP" && <SipCalculator />}
       </div>
     </>
   );
