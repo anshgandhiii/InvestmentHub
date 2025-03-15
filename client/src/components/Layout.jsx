@@ -39,9 +39,9 @@ export function Layout() {
             <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsNavbarOpen(!isNavbarOpen)}>
               <FaBars className="h-6 w-6" />
             </button>
-            <Link to="/" className="flex items-center gap-2 text-xl font-bold">
+            <Link to="/landing" className="flex items-center gap-2 text-xl font-bold">
               <FaChartLine className="h-6 w-6" />
-              InvestPro
+              InvestmentHub
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6">

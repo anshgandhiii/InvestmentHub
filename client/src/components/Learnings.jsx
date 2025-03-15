@@ -18,8 +18,7 @@ export default function Learning() {
   const [shares, setShares] = useState(0);
   const [activeTab, setActiveTab] = useState("ebooks");
 
-// Add your resources data here
-const resources = {
+  const resources = {
     ebooks: [
       {
         id: 1,
@@ -29,7 +28,7 @@ const resources = {
         duration: "3 hours",
         progress: 0,
         author: "Sarah Johnson",
-        image: "https://source.unsplash.com/featured/?investment,finance",
+        image: "https://picsum.photos/200",
       },
       {
         id: 2,
@@ -39,7 +38,7 @@ const resources = {
         duration: "5 hours",
         progress: 25,
         author: "Michael Chen",
-        image: "https://source.unsplash.com/featured/?stocks,charts",
+        image: "https://picsum.photos/200",
       },
       {
         id: 3,
@@ -49,7 +48,7 @@ const resources = {
         duration: "4 hours",
         progress: 75,
         author: "Robert Kiyosaki",
-        image: "https://source.unsplash.com/featured/?portfolio,investment",
+        image: "https://picsum.photos/200",
       },
     ],
     videos: [
@@ -61,7 +60,7 @@ const resources = {
         duration: "45 minutes",
         progress: 50,
         author: "Trading Academy",
-        image: "https://source.unsplash.com/featured/?candlestick,trading",
+        image: "https://picsum.photos/200",
       },
       {
         id: 2,
@@ -71,7 +70,7 @@ const resources = {
         duration: "1.5 hours",
         progress: 10,
         author: "Market Masters",
-        image: "https://source.unsplash.com/featured/?daytrading,stocks",
+        image: "https://picsum.photos/200",
       },
       {
         id: 3,
@@ -81,7 +80,7 @@ const resources = {
         duration: "2 hours",
         progress: 0,
         author: "Options Pro",
-        image: "https://source.unsplash.com/featured/?options,finance",
+        image: "https://picsum.photos/200",
       },
     ],
     articles: [
@@ -93,7 +92,7 @@ const resources = {
         duration: "15 minutes",
         progress: 100,
         author: "Financial Times",
-        image: "https://source.unsplash.com/featured/?market,sentiment",
+        image: "https://picsum.photos/200",
       },
       {
         id: 2,
@@ -103,7 +102,7 @@ const resources = {
         duration: "10 minutes",
         progress: 0,
         author: "Investopedia",
-        image: "https://source.unsplash.com/featured/?risk,management",
+        image: "https://picsum.photos/200",
       },
       {
         id: 3,
@@ -113,12 +112,10 @@ const resources = {
         duration: "25 minutes",
         progress: 30,
         author: "Quant Magazine",
-        image: "https://source.unsplash.com/featured/?algorithmic,trading",
+        image: "https://picsum.photos/200",
       },
     ],
   };
-  
-  
 
   const filterResources = (resourceList) => {
     return resourceList.filter((resource) => {
