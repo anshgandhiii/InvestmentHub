@@ -15,6 +15,12 @@ pip install django channels channels_redis djangorestframework django-cors-heade
 pip install python-dotenv
 python -m pip install Pillow
 
+
+pip install psycopg2-binary
+pip install cloud-sql-python-connector
+
+
+
 # .env in project server:
 
 

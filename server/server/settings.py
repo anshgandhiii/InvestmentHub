@@ -107,7 +107,14 @@ ASGI_APPLICATION = "server.asgi.application"
 # }
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'investmenthub-db',
+        'USER': 'investmenthub-db',
+        'PASSWORD': 'db@123',
+        'HOST': '35.200.222.7',
+        'PORT': '5432',
+    }
 }
 
 
