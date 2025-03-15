@@ -1,379 +1,254 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaChartLine, FaBars, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie, FaNewspaper, FaHistory, FaGamepad, FaMoneyBillWave } from "react-icons/fa";
+import { TradePanel } from "./TradePanel";
+import { InvestmentSuggestions } from "./InvestmentSuggessions";
+import { ProfitCalculator } from "./ProfitCalculator";
+import { AccountBalance } from "./AccountBalance";
 
-// components/Dashboard.js
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import PortfolioSummary from './portfolio/PortfolioSummary';
-import RecentTransactions from './transactions/RecentTransactions';
-import MarketOverview from './market/MarketOverview';
-import TopRecommendations from './recommendations/TopRecommendations';
-import AccountBalance from './account/AccountBalance';
-import InvestmentService from '../services/InvestmentService';
-import '../styles/Dashboard.css';
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-const Dashboard = () => {
-  const [portfolioData, setPortfolioData] = useState(null);
-  const [recentTransactions, setRecentTransactions] = useState([]);
-  const [marketData, setMarketData] = useState(null);
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const portfolioSummary = [
+    { title: "Portfolio", value: "$45,231.89", icon: <FaDollarSign className="h-6 w-6 text-indigo-500" />, trend: "+20.1%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
+    { title: "Stocks", value: "$28,566.00", icon: <FaChartLine className="h-6 w-6 text-indigo-500" />, trend: "+12.5%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
+    { title: "Bonds", value: "$12,543.00", icon: <FaChartBar className="h-6 w-6 text-indigo-500" />, trend: "+4.3%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
+    { title: "Insurance", value: "$4,122.89", icon: <FaChartPie className="h-6 w-6 text-indigo-500" />, trend: "-2.5%", trendIcon: <FaArrowDown className="h-4 w-4 text-red-500" />, trendColor: "bg-red-100 text-red-600" },
+  ];
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [portfolio, transactions, market, recs] = await Promise.all([
-          InvestmentService.getPortfolioSummary(),
-          InvestmentService.getRecentTransactions(5),
-          InvestmentService.getMarketOverview(),
-          InvestmentService.getPersonalizedRecommendations(3)
-        ]);
-        
-        setPortfolioData(portfolio);
-        setRecentTransactions(transactions);
-        setMarketData(market);
-        setRecommendations(recs);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const navItems = [
+    { label: "Dashboard", path: "/dashboard", active: true },
+    { label: "Profile", path: "/profile", active: false },
+    { label: "Logout", path: "/logout", active: false },
+  ];
 
-    fetchDashboardData();
-  }, []);
+  const sidebarItems = [
+    { label: "News", icon: <FaNewspaper className="h-5 w-5 text-indigo-500" />, action: () => alert("News section coming soon!") },
+    { label: "History", icon: <FaHistory className="h-5 w-5 text-indigo-500" />, action: () => alert("Transaction History section coming soon!") },
+    { label: "Virtual Trading", icon: <FaGamepad className="h-5 w-5 text-indigo-500" />, action: () => alert("Virtual Trading section coming soon!") },
+  ];
 
-  if (loading) {
-    return <div className="loading">Loading dashboard data...</div>;
-  }
+  const newsItems = [
+    { title: "Market Hits Record High", date: "Mar 15, 2025" },
+    { title: "Tech Stocks Surge", date: "Mar 14, 2025" },
+  ];
+
+  const transactionHistory = [
+    { type: "Buy AAPL", amount: "-$913.15", date: "Mar 12, 2025" },
+    { type: "Deposit", amount: "+$2,000.00", date: "Mar 10, 2025" },
+  ];
+
+  const virtualTradingStats = { balance: "$10,000.00", gainLoss: "+5.2%" };
 
   return (
-    <div className="dashboard">
-      <h1>Investment Dashboard</h1>
-      
-      <div className="dashboard-row">
-        <div className="dashboard-widget wide">
-          <PortfolioSummary data={portfolioData} />
-        </div>
-        <div className="dashboard-widget">
-          <AccountBalance />
-        </div>
-      </div>
-      
-      <div className="dashboard-row">
-        <div className="dashboard-widget">
-          <MarketOverview data={marketData} />
-        </div>
-        <div className="dashboard-widget">
-          <TopRecommendations recommendations={recommendations} />
-        </div>
-      </div>
-      
-      <div className="dashboard-row">
-        <div className="dashboard-widget wide">
-          <RecentTransactions transactions={recentTransactions} />
-          <div className="view-all">
-            <Link to="/transactions">View All Transactions</Link>
+    <div className="flex min-h-screen w-full flex-col bg-gray-100">
+      {/* Navbar */}
+      <nav className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg px-4 py-3 sticky top-0 z-20 w-full">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsNavbarOpen(!isNavbarOpen)}>
+              <FaBars className="h-6 w-6" />
+            </button>
+            <Link to="/" className="flex items-center gap-2 text-xl font-bold">
+              <FaChartLine className="h-6 w-6" />
+              InvestPro
+            </Link>
           </div>
-        </div>
-      </div>
-      
-      <div className="dashboard-actions">
-        <Link to="/profit-calculator" className="action-button">
-          <span className="icon">📈</span>
-          <span>Estimate Profits</span>
-        </Link>
-        <Link to="/recommendations" className="action-button">
-          <span className="icon">💡</span>
-          <span>Get Investment Suggestions</span>
-        </Link>
-        <Link to="/stocks" className="action-button">
-          <span className="icon">💰</span>
-          <span>Buy/Sell Assets</span>
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
-
-// components/recommendations/Recommendations.js
-import React, { useState, useEffect } from 'react';
-import RecommendationFilters from './RecommendationFilters';
-import RecommendationList from './RecommendationList';
-import InvestmentService from '../../services/InvestmentService';
-import '../../styles/Recommendations.css';
-
-const Recommendations = () => {
-  const [recommendations, setRecommendations] = useState([]);
-  const [filters, setFilters] = useState({
-    riskLevel: 'all',
-    assetType: 'all',
-    timeHorizon: 'all'
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchRecommendations();
-  }, [filters]);
-
-  const fetchRecommendations = async () => {
-    setLoading(true);
-    try {
-      const data = await InvestmentService.getRecommendations(filters);
-      setRecommendations(data);
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters });
-  };
-
-  return (
-    <div className="recommendations-container">
-      <h1>Investment Recommendations</h1>
-      <p className="description">
-        Get personalized investment suggestions based on your risk profile, 
-        investment goals, and market conditions.
-      </p>
-      
-      <RecommendationFilters 
-        filters={filters} 
-        onFilterChange={handleFilterChange} 
-      />
-      
-      {loading ? (
-        <div className="loading">Loading recommendations...</div>
-      ) : (
-        <RecommendationList recommendations={recommendations} />
-      )}
-    </div>
-  );
-};
-
-export default Recommendations;
-
-// components/tools/ProfitCalculator.js
-import React, { useState } from 'react';
-import InvestmentService from '../../services/InvestmentService';
-import '../../styles/ProfitCalculator.css';
-
-const ProfitCalculator = () => {
-  const [formData, setFormData] = useState({
-    investmentType: 'stock',
-    amount: 1000,
-    duration: 5,
-    riskLevel: 'medium',
-    reinvestDividends: false
-  });
-  
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const calculationResults = await InvestmentService.calculatePotentialReturns(formData);
-      setResults(calculationResults);
-    } catch (error) {
-      console.error('Error calculating profits:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="profit-calculator">
-      <h1>Investment Profit Calculator</h1>
-      <p className="description">
-        Estimate potential returns on your investments based on historical data 
-        and market projections.
-      </p>
-      
-      <div className="calculator-container">
-        <form onSubmit={handleSubmit} className="calculator-form">
-          <div className="form-group">
-            <label htmlFor="investmentType">Investment Type</label>
-            <select 
-              id="investmentType" 
-              name="investmentType" 
-              value={formData.investmentType}
-              onChange={handleInputChange}
-            >
-              <option value="stock">Stocks</option>
-              <option value="bond">Bonds</option>
-              <option value="etf">ETFs</option>
-              <option value="mutual">Mutual Funds</option>
-              <option value="insurance">Insurance Products</option>
-            </select>
+          <div className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`text-sm font-medium ${item.active ? "underline" : "hover:text-indigo-200"} transition-colors`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
-          
-          <div className="form-group">
-            <label htmlFor="amount">Investment Amount ($)</label>
-            <input 
-              type="number" 
-              id="amount" 
-              name="amount" 
-              value={formData.amount}
-              onChange={handleInputChange}
-              min="100"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="duration">Investment Duration (years)</label>
-            <input 
-              type="number" 
-              id="duration" 
-              name="duration" 
-              value={formData.duration}
-              onChange={handleInputChange}
-              min="1"
-              max="30"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="riskLevel">Risk Level</label>
-            <select 
-              id="riskLevel" 
-              name="riskLevel" 
-              value={formData.riskLevel}
-              onChange={handleInputChange}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-          
-          <div className="form-group checkbox">
-            <input 
-              type="checkbox" 
-              id="reinvestDividends" 
-              name="reinvestDividends" 
-              checked={formData.reinvestDividends}
-              onChange={handleInputChange}
-            />
-            <label htmlFor="reinvestDividends">Reinvest Dividends/Interest</label>
-          </div>
-          
-          <button type="submit" className="calculator-button" disabled={loading}>
-            {loading ? 'Calculating...' : 'Calculate Potential Returns'}
+          {isNavbarOpen && (
+            <div className="md:hidden absolute top-16 left-0 w-full bg-indigo-600 shadow-lg p-4 flex flex-col gap-4 z-10">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  className={`text-sm font-medium ${item.active ? "underline" : "hover:text-indigo-200"}`}
+                  onClick={() => setIsNavbarOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )}
+          <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            <FaBars className="h-6 w-6" />
           </button>
-        </form>
-        
-        {results && (
-          <div className="calculator-results">
-            <h2>Projected Returns</h2>
-            
-            <div className="result-item">
-              <span>Initial Investment:</span>
-              <span>${formData.amount.toLocaleString()}</span>
+        </div>
+      </nav>
+
+      {/* Main Layout with Sidebar */}
+      <div className="flex flex-1 w-full">
+        {/* Sidebar */}
+        <aside
+          className={`bg-white shadow-lg p-6 w-72 flex-shrink-0 fixed md:static inset-y-0 left-0 z-10 transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 transition-transform duration-300`}
+        >
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                <FaChartLine /> Tools
+              </h3>
+              <button className="md:hidden" onClick={() => setIsSidebarOpen(false)}>
+                <FaBars className="h-5 w-5 text-gray-600" />
+              </button>
             </div>
-            
-            <div className="result-item">
-              <span>Projected Value:</span>
-              <span>${results.projectedValue.toLocaleString()}</span>
+            <ul className="space-y-3">
+              {sidebarItems.map((item) => (
+                <li key={item.label}>
+                  <button
+                    onClick={item.action}
+                    className="w-full flex items-center gap-3 p-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all shadow-sm"
+                  >
+                    {item.icon}
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                <FaNewspaper className="text-indigo-500" /> News
+              </h4>
+              {newsItems.map((news, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                  <p className="text-sm font-medium text-gray-700">{news.title}</p>
+                  <p className="text-xs text-gray-500">{news.date}</p>
+                </div>
+              ))}
+              <button className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+                <FaArrowUp className="h-3 w-3" /> More
+              </button>
             </div>
-            
-            <div className="result-item">
-              <span>Total Return:</span>
-              <span>${results.totalReturn.toLocaleString()} ({results.returnPercentage}%)</span>
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                <FaHistory className="text-indigo-500" /> Transactions
+              </h4>
+              {transactionHistory.map((tx, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-lg shadow-sm flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">{tx.type}</p>
+                    <p className="text-xs text-gray-500">{tx.date}</p>
+                  </div>
+                  <p className={`text-sm font-semibold ${tx.amount.startsWith("+") ? "text-green-600" : "text-red-600"}`}>{tx.amount}</p>
+                </div>
+              ))}
+              <button className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+                <FaArrowUp className="h-3 w-3" /> More
+              </button>
             </div>
-            
-            <div className="result-item">
-              <span>Annual Return Rate:</span>
-              <span>{results.annualReturnRate}%</span>
-            </div>
-            
-            <div className="result-charts">
-              {/* Charts would be rendered here using a library like Chart.js or Recharts */}
-              <div className="chart-placeholder">Growth Projection Chart</div>
-            </div>
-            
-            <div className="result-disclaimer">
-              <p>
-                Note: These projections are based on historical data and market assumptions. 
-                Actual returns may vary. Past performance is not indicative of future results.
-              </p>
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                <FaGamepad className="text-indigo-500" /> Virtual Trading
+              </h4>
+              <div className="bg-gradient-to-r from-indigo-50 to-gray-50 p-3 rounded-lg shadow-sm">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-700">Balance</p>
+                  <p className="text-sm font-semibold text-indigo-600">{virtualTradingStats.balance}</p>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-sm text-gray-700">Gain/Loss</p>
+                  <p className={`text-sm font-semibold ${virtualTradingStats.gainLoss.startsWith("+") ? "text-green-600" : "text-red-600"}`}>
+                    {virtualTradingStats.gainLoss}
+                  </p>
+                </div>
+              </div>
+              <button className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
+                <FaGamepad className="h-3 w-3" /> Trade Now
+              </button>
             </div>
           </div>
-        )}
+        </aside>
+
+        {/* Main Content */}
+        <div className="flex-1 p-6 w-full max-w-7xl mx-auto">
+          {/* Portfolio Summary */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+            {portfolioSummary.map((item, index) => (
+              <div key={index} className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    <h2 className="text-sm font-semibold text-gray-700">{item.title}</h2>
+                  </div>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${item.trendColor}`}>
+                    {item.trendIcon} {item.trend}
+                  </span>
+                </div>
+                <div className="mt-4 text-2xl font-bold text-gray-900">{item.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tabs */}
+          <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
+            {["overview", "trade", "suggestions", "calculator"].map((tab) => (
+              <button
+                key={tab}
+                className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  activeTab === tab ? "bg-indigo-600 text-white shadow-md" : "text-gray-600 hover:bg-indigo-50"
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="animate-fade-in space-y-8">
+            {activeTab === "overview" && (
+              <>
+                <AccountBalance />
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="bg-white p-6 rounded-xl shadow-md col-span-2">
+                    <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                      <FaChartLine className="text-indigo-500" /> Performance
+                    </h2>
+                    <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4 flex items-center justify-center">
+                      <FaChartLine className="h-16 w-16 text-indigo-300" />
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl shadow-md">
+                    <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                      <FaChartPie className="text-indigo-500" /> Allocation
+                    </h2>
+                    <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4 flex items-center justify-center">
+                      <FaChartPie className="h-16 w-16 text-indigo-300" />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            {activeTab === "trade" && <TradePanel />}
+            {activeTab === "suggestions" && <InvestmentSuggestions />}
+            {activeTab === "calculator" && <ProfitCalculator />}
+          </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="footer p-6 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white w-full">
+        <div className="flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl mx-auto">
+          <p className="text-sm font-medium">© 2025 InvestPro</p>
+          <div className="flex gap-6 mt-4 sm:mt-0">
+            <button className="text-sm hover:underline">Terms</button>
+            <button className="text-sm hover:underline">Privacy</button>
+            <button className="text-sm hover:underline">Contact</button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default ProfitCalculator;
-
-// components/stocks/StockMarket.js
-import React, { useState, useEffect } from 'react';
-import StockList from './StockList';
-import StockSearch from './StockSearch';
-import StockFilters from './StockFilters';
-import StockOrderForm from './StockOrderForm';
-import InvestmentService from '../../services/InvestmentService';
-import '../../styles/StockMarket.css';
-
-const StockMarket = () => {
-  const [stocks, setStocks] = useState([]);
-  const [filteredStocks, setFilteredStocks] = useState([]);
-  const [selectedStock, setSelectedStock] = useState(null);
-  const [filters, setFilters] = useState({
-    sector: 'all',
-    priceRange: [0, 5000],
-    marketCap: 'all'
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchStocks = async () => {
-      try {
-        const data = await InvestmentService.getStocks();
-        setStocks(data);
-        setFilteredStocks(data);
-      } catch (error) {
-        console.error('Error fetching stocks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStocks();
-  }, []);
-
-  useEffect(() => {
-    // Apply filters and search
-    let results = [...stocks];
-    
-    // Apply search term
-    if (searchTerm) {
-      results = results.filter(stock => 
-        stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        stock.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply sector filter
-    if (filters.sector !== 'all') {
-      results = results.filter(stock => stock.sector === filters.sector);
-    }
-    
-    // Apply price range filter
-    results = results.filter(stock => 
-      stock.price >= filters.priceRange[0
+}
