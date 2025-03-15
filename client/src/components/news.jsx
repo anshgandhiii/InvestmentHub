@@ -16,7 +16,7 @@ function News() {
   const [error, setError] = useState(null);
 
   // Alpha Vantage API key (replace with your own valid key in production)
-  const apiKey = 'V7Y9XOCM0RLWUR0L';
+  const apiKey = 'OVH195S2573METPL';
 
   // Build the API URL based on current state
   const buildApiUrl = useCallback(() => {
