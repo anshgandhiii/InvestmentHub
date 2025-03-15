@@ -11,13 +11,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />}>
-          <Route path="landing" element={<LandingPage />} />
+        <Route path="landing" element={<LandingPage />} />
+        <Route path="/" element={<Layout />}>
           
-          <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="news" element={<News />} />
-          <Route path="*" element={<Navigate to="/landing" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
