@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaChartLine, FaBars, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie, FaNewspaper, FaHistory, FaGamepad, FaMoneyBillWave } from "react-icons/fa";
 import { TradePanel } from "./TradePanel";
@@ -10,13 +10,53 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // State for backend data
+  const [portfolioSummary, setPortfolioSummary] = useState([]);
+  const [newsItems, setNewsItems] = useState([]);
+  const [transactionHistory, setTransactionHistory] = useState([]);
+  const [virtualTradingStats, setVirtualTradingStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const portfolioSummary = [
-    { title: "Portfolio", value: "$45,231.89", icon: <FaDollarSign className="h-6 w-6 text-indigo-500" />, trend: "+20.1%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
-    { title: "Stocks", value: "$28,566.00", icon: <FaChartLine className="h-6 w-6 text-indigo-500" />, trend: "+12.5%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
-    { title: "Bonds", value: "$12,543.00", icon: <FaChartBar className="h-6 w-6 text-indigo-500" />, trend: "+4.3%", trendIcon: <FaArrowUp className="h-4 w-4 text-green-500" />, trendColor: "bg-green-100 text-green-600" },
-    { title: "Insurance", value: "$4,122.89", icon: <FaChartPie className="h-6 w-6 text-indigo-500" />, trend: "-2.5%", trendIcon: <FaArrowDown className="h-4 w-4 text-red-500" />, trendColor: "bg-red-100 text-red-600" },
-  ];
+  // API endpoints (replace with your actual backend URLs)
+  const API_BASE_URL = "http://127.0.0.1:8000/"; // Replace with your backend URL
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch Portfolio Summary
+        const portfolioResponse = await fetch(`${API_BASE_URL}/investment/portfolio`);
+        const portfolioData = await portfolioResponse.json();
+        setPortfolioSummary(portfolioData);
+
+        // Fetch News
+        const newsResponse = await fetch(`${API_BASE_URL}/news`);
+        const newsData = await newsResponse.json();
+        setNewsItems(newsData);
+
+        // Fetch Transaction History
+        const transactionsResponse = await fetch(`${API_BASE_URL}/investment/transactions`);
+        const transactionsData = await transactionsResponse.json();
+        setTransactionHistory(transactionsData);
+
+        // Fetch Virtual Trading Stats
+        const virtualTradingResponse = await fetch(`${API_BASE_URL}/virtual-trading`);
+        const virtualTradingData = await virtualTradingResponse.json();
+        setVirtualTradingStats(virtualTradingData);
+
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch data from the server.");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array means it runs once on mount
 
   const navItems = [
     { label: "Dashboard", path: "/dashboard", active: true },
@@ -30,17 +70,21 @@ export default function Dashboard() {
     { label: "Virtual Trading", icon: <FaGamepad className="h-5 w-5 text-indigo-500" />, action: () => alert("Virtual Trading section coming soon!") },
   ];
 
-  const newsItems = [
-    { title: "Market Hits Record High", date: "Mar 15, 2025" },
-    { title: "Tech Stocks Surge", date: "Mar 14, 2025" },
-  ];
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-100">
+        <p className="text-lg text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
-  const transactionHistory = [
-    { type: "Buy AAPL", amount: "-$913.15", date: "Mar 12, 2025" },
-    { type: "Deposit", amount: "+$2,000.00", date: "Mar 10, 2025" },
-  ];
-
-  const virtualTradingStats = { balance: "$10,000.00", gainLoss: "+5.2%" };
+  if (error) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-gray-100">
+        <p className="text-lg text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-gray-100">
@@ -53,7 +97,7 @@ export default function Dashboard() {
             </button>
             <Link to="/" className="flex items-center gap-2 text-xl font-bold">
               <FaChartLine className="h-6 w-6" />
-              InvestPro
+              InvestmentHub
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6">
