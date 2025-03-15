@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaArrowUp, FaArrowDown, FaChartLine } from "react-icons/fa";
-import stockData from "../stocks.json"
+import stockData from "../stocks.json";
 
 export function StockDetail() {
   const { symbol } = useParams(); // Get stock symbol from URL
