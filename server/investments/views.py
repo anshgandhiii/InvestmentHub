@@ -47,6 +47,7 @@ class TransactionView(APIView):
             if profile.balance < amount:
                 return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
             profile.balance -= amount
+            profile.boughtsum += amount  # Increase boughtsum for buy
             Portfolio.objects.update_or_create(
                 user_profile=profile, asset=asset,
                 defaults={'quantity': models.F('quantity') + quantity}
@@ -56,11 +57,16 @@ class TransactionView(APIView):
             if portfolio.quantity < quantity:
                 return Response({"error": "Not enough assets to sell"}, status=status.HTTP_400_BAD_REQUEST)
             profile.balance += amount
+            profile.boughtsum -= amount  # Decrease boughtsum for sell
             portfolio.quantity -= quantity
             if portfolio.quantity == 0:
                 portfolio.delete()
             else:
                 portfolio.save()
+
+        # Ensure boughtsum doesn't go negative (optional safeguard)
+        if profile.boughtsum < 0:
+            profile.boughtsum = 0
 
         profile.save()
         transaction = Transaction.objects.create(
