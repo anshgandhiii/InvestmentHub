@@ -4,6 +4,7 @@ import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
 import SipCalculator from "./SipCalculator";
+import InsurancePurchase from "./InsurancePurchase";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -35,6 +36,9 @@ export default function Dashboard() {
           .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
         const insuranceValue = portfolioData
           .filter((item) => item.asset.type === "insurance")
+          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
+        const sipValue = portfolioData
+          .filter((item) => item.asset.type === "sip")
           .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
 
         // Use boughtsum as the initial investment for trend calculation
@@ -148,7 +152,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "SIP"].map((tab) => (
+        {["overview", "trade", "suggestions", "SIP", "Insurance"].map((tab) => (
           <button
             key={tab}
             className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -196,6 +200,7 @@ export default function Dashboard() {
         {activeTab === "trade" && <TradePanel />}
         {activeTab === "suggestions" && <InvestmentSuggestions />}
         {activeTab === "SIP" && <SipCalculator />}
+        {activeTab === "Insurance" && <InsurancePurchase />}
       </div>
     </div>
   );
