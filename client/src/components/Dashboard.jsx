@@ -3,9 +3,7 @@ import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartP
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
-import { ProfitCalculator } from "./ProfitCalculator";
 import SipCalculator from "./SipCalculator"
-import { AccountBalance } from "./AccountBalance";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
