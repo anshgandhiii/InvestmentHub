@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
-import { ProfitCalculator } from "./ProfitCalculator";
+import SipCalculator from "./SipCalculator"
 import { AccountBalance } from "./AccountBalance";
 
 export default function Dashboard() {
@@ -77,7 +77,7 @@ export default function Dashboard() {
         )}
         {activeTab === "trade" && <TradePanel />}
         {activeTab === "suggestions" && <InvestmentSuggestions />}
-        {activeTab === "calculator" && <ProfitCalculator />}
+        {activeTab === "calculator" && <SipCalculator />}
       </div>
     </>
   );
