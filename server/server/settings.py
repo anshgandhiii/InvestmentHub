@@ -93,8 +93,12 @@ ASGI_APPLICATION = "server.asgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Or the database you're using (e.g., 'postgresql', 'mysql')
-        'NAME': BASE_DIR / 'db.sqlite3',  # Adjust this if using a different database
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'investmenthub-db',
+        'USER': 'investmenthub-db',
+        'PASSWORD': 'db@123',
+        'HOST': '35.200.222.7',
+        'PORT': '5432',
     }
 }
 
