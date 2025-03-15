@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer as ProfileSerializer
-from .models import UserProfile as Profile
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
+from .models import UserProfile
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -24,15 +24,14 @@ class UserLoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserProfileView(APIView):
-    def get(self, request, id):  # Use 'id' instead of getting it from query parameters
+class ProfileView(APIView):
+    def get(self, request, id=None):
         try:
-            user = User.objects.get(id=id)
-            profile, created = Profile.objects.get_or_create(user=user)  # Get or create profile
-            serializer = ProfileSerializer(profile)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            profile = UserProfile.objects.get(user__id=id)
+            serializer = UserProfileSerializer(profile)
+            return Response(serializer.data)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 

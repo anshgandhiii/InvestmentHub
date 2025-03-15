@@ -4,17 +4,23 @@ import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
 import SipCalculator from "./SipCalculator";
+import InsurancePurchase from "./InsurancePurchase";
+import stockData from "../stocks.json"; // Import stocks.json for current prices
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [portfolioSummary, setPortfolioSummary] = useState([]);
   const [profile, setProfile] = useState({});
+  const [portfolioData, setPortfolioData] = useState([]); // Store initial portfolio data
   const [loading, setLoading] = useState(true);
+  const [currentPriceIndex, setCurrentPriceIndex] = useState(0); // Track current price timestamp
   const userId = localStorage.getItem("user_id");
+  const stocks = stockData.stocks;
 
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
+        // Fetch portfolio and profile data from backend
         const portfolioResponse = await axios.get(`http://127.0.0.1:8000/investment/portfolio/${userId}/`, {
           headers: { "User-Id": userId },
         });
@@ -22,93 +28,12 @@ export default function Dashboard() {
           headers: { "User-Id": userId },
         });
 
-        const portfolioData = portfolioResponse.data;
+        const fetchedPortfolioData = portfolioResponse.data;
         const profileData = profileResponse.data;
 
-        // Calculate current portfolio values
-        const totalPortfolio = portfolioData.reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const stocksValue = portfolioData
-          .filter((item) => item.asset.type === "stock")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const bondsValue = portfolioData
-          .filter((item) => item.asset.type === "bond")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-        const insuranceValue = portfolioData
-          .filter((item) => item.asset.type === "insurance")
-          .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
-
-        // Use boughtsum as the initial investment for trend calculation
-        const boughtsum = parseFloat(profileData.boughtsum) || 0;
-
-        // Calculate dynamic trends based on boughtsum
-        const calculateTrend = (currentValue, initialValue) => {
-          if (initialValue === 0) return { percentage: "0.0%", direction: "neutral" };
-          const change = ((currentValue - initialValue) / initialValue) * 100;
-          return {
-            percentage: `${change >= 0 ? "+" : ""}${change.toFixed(1)}%`,
-            direction: change > 0 ? "up" : change < 0 ? "down" : "neutral",
-          };
-        };
-
-        // Assume initial allocation proportions if boughtsum is non-zero (simplified)
-        const portfolioTrend = calculateTrend(totalPortfolio, boughtsum);
-        const stocksTrend = calculateTrend(stocksValue, boughtsum * 0.6); // 60% initial allocation assumption
-        const bondsTrend = calculateTrend(bondsValue, boughtsum * 0.3);  // 30% initial allocation assumption
-        const insuranceTrend = calculateTrend(insuranceValue, boughtsum * 0.1); // 10% initial allocation assumption
-
-        const summary = [
-          {
-            title: "Portfolio",
-            value: `$${totalPortfolio.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            icon: <FaDollarSign className="h-6 w-6 text-indigo-500" />,
-            trend: portfolioTrend.percentage,
-            trendIcon: portfolioTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : portfolioTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: portfolioTrend.direction === "up" ? "bg-green-100 text-green-600" : portfolioTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
-          },
-          {
-            title: "Stocks",
-            value: `$${stocksValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            icon: <FaChartLine className="h-6 w-6 text-indigo-500" />,
-            trend: stocksTrend.percentage,
-            trendIcon: stocksTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : stocksTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: stocksTrend.direction === "up" ? "bg-green-100 text-green-600" : stocksTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
-          },
-          {
-            title: "Bonds",
-            value: `$${bondsValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            icon: <FaChartBar className="h-6 w-6 text-indigo-500" />,
-            trend: bondsTrend.percentage,
-            trendIcon: bondsTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : bondsTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: bondsTrend.direction === "up" ? "bg-green-100 text-green-600" : bondsTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
-          },
-          {
-            title: "Insurance",
-            value: `$${insuranceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            icon: <FaChartPie className="h-6 w-6 text-indigo-500" />,
-            trend: insuranceTrend.percentage,
-            trendIcon: insuranceTrend.direction === "up" ? (
-              <FaArrowUp className="h-4 w-4 text-green-500" />
-            ) : insuranceTrend.direction === "down" ? (
-              <FaArrowDown className="h-4 w-4 text-red-500" />
-            ) : null,
-            trendColor: insuranceTrend.direction === "up" ? "bg-green-100 text-green-600" : insuranceTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
-          },
-        ];
-
-        setPortfolioSummary(summary);
+        setPortfolioData(fetchedPortfolioData);
         setProfile(profileData);
+        updatePortfolioSummary(fetchedPortfolioData, profileData, 0); // Initial summary with first price index
         setLoading(false);
       } catch (error) {
         console.error("Error fetching portfolio data:", error);
@@ -118,6 +43,95 @@ export default function Dashboard() {
 
     if (userId) fetchPortfolioData();
   }, [userId]);
+
+  // Function to update portfolio summary based on current price index
+  const updatePortfolioSummary = (portfolio, profileData, priceIndex) => {
+    // Get timestamps from the first stock (assuming all have same timestamps)
+    const timestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse() : [];
+
+    // Get current prices for all stocks at the given index
+    const currentPrices = {};
+    stocks.forEach((stock) => {
+      const symbol = stock["Meta Data"]["2. Symbol"];
+      currentPrices[symbol] = timestamps[priceIndex]
+        ? parseFloat(stock["Time Series (5min)"][timestamps[priceIndex]]["4. close"])
+        : 0;
+    });
+
+    // Calculate current portfolio value using current prices
+    const totalPortfolio = portfolio.reduce((sum, item) => {
+      const currentPrice = currentPrices[item.asset_symbol] || 0;
+      return sum + currentPrice * item.quantity;
+    }, 0);
+
+    const stocksValue = parseFloat(profileData.stocks) || 0;
+    const bondsValue = parseFloat(profileData.bonds) || 0;
+    const insuranceValue = parseFloat(profileData.insurance) || 0;
+    const boughtsum = parseFloat(profileData.boughtsum) || 0;
+
+    // Calculate trend based on current portfolio value vs. boughtsum
+    const calculateTrend = (currentValue, initialValue) => {
+      if (initialValue === 0) return { percentage: "0.0%", direction: "neutral" };
+      const change = ((currentValue - initialValue) / initialValue) * 100;
+      return {
+        percentage: `${change >= 0 ? "+" : ""}${change.toFixed(1)}%`,
+        direction: change > 0 ? "up" : change < 0 ? "down" : "neutral",
+      };
+    };
+
+    const portfolioTrend = calculateTrend(totalPortfolio, boughtsum);
+
+    // Update portfolio summary
+    const summary = [
+      {
+        title: "Portfolio",
+        value: `$${totalPortfolio.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: <FaDollarSign className="h-6 w-6 text-indigo-500" />,
+        trend: portfolioTrend.percentage,
+        trendIcon: portfolioTrend.direction === "up" ? (
+          <FaArrowUp className="h-4 w-4 text-green-500" />
+        ) : portfolioTrend.direction === "down" ? (
+          <FaArrowDown className="h-4 w-4 text-red-500" />
+        ) : null,
+        trendColor: portfolioTrend.direction === "up" ? "bg-green-100 text-green-600" : portfolioTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+      },
+      {
+        title: "Stocks",
+        value: `$${stocksValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: <FaChartLine className="h-6 w-6 text-indigo-500" />,
+      },
+      {
+        title: "Bonds",
+        value: `$${bondsValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: <FaChartBar className="h-6 w-6 text-indigo-500" />,
+      },
+      {
+        title: "Insurance",
+        value: `$${insuranceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: <FaChartPie className="h-6 w-6 text-indigo-500" />,
+      },
+    ];
+
+    setPortfolioSummary(summary);
+  };
+
+  // Effect to simulate real-time price updates
+  useEffect(() => {
+    if (loading || !portfolioData.length) return;
+
+    const timestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse() : [];
+    if (!timestamps.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentPriceIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % timestamps.length;
+        updatePortfolioSummary(portfolioData, profile, nextIndex);
+        return nextIndex;
+      });
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [loading, portfolioData, profile]);
 
   if (loading) {
     return <div className="text-center p-6">Loading dashboard...</div>;
@@ -137,9 +151,11 @@ export default function Dashboard() {
                 {item.icon}
                 <h2 className="text-sm font-semibold text-gray-700">{item.title}</h2>
               </div>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${item.trendColor}`}>
-                {item.trendIcon} {item.trend}
-              </span>
+              {item.trend && (
+                <span className={`text-xs font-medium px-2 py-1 rounded-full ${item.trendColor}`}>
+                  {item.trendIcon} {item.trend}
+                </span>
+              )}
             </div>
             <div className="mt-4 text-2xl font-bold text-gray-900">{item.value}</div>
           </div>
@@ -148,7 +164,7 @@ export default function Dashboard() {
 
       {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "SIP"].map((tab) => (
+        {["overview", "trade", "suggestions", "SIP", "Insurance"].map((tab) => (
           <button
             key={tab}
             className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -170,8 +186,10 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold">Account Balance</h3>
                 <button className="btn btn-sm btn-outline">Add Funds</button>
               </div>
-              <p className="text-xl font-bold">Rs.{profile.balance}</p>
-              <p className="text-gray-500 text-sm">Last deposit: Rs.2,000 on Mar 10, 2025</p>
+              <p className="text-xl font-bold">
+                ₹{profile.balance ? parseFloat(profile.balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}
+              </p>
+              <p className="text-gray-500 text-sm">Last deposit: ₹2,000 on Mar 10, 2025</p>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <div className="bg-white p-6 rounded-xl shadow-md col-span-2">
@@ -196,6 +214,7 @@ export default function Dashboard() {
         {activeTab === "trade" && <TradePanel />}
         {activeTab === "suggestions" && <InvestmentSuggestions />}
         {activeTab === "SIP" && <SipCalculator />}
+        {activeTab === "Insurance" && <InsurancePurchase />}
       </div>
     </div>
   );
