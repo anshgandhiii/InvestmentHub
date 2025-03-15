@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaArrowUp, FaArrowDown, FaInfoCircle } from "react-icons/fa";
-import stockData from "../../public/stocks.json"; // Ensure path is correct
+import stockData from "../stocks.json"; // Ensure path is correct
 
 export function TradePanel() {
   const [currentPrices, setCurrentPrices] = useState({});
