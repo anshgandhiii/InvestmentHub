@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Asset, Portfolio, Transaction
-from .serializers import AssetSerializer, PortfolioSerializer, TransactionSerializer
+from .models import Portfolio, Transaction
+from .serializers import PortfolioSerializer, TransactionSerializer
 from account.models import UserProfile
 import google.generativeai as genai
 from .tools import InvestmentPortalTools
@@ -11,207 +11,183 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from django.db import models
 from decimal import Decimal
-import os, json
+import logging
 
-class InsuranceView(APIView):
-    def load_insurance_plans(self):
-        """Load insurance plans from insurance.json."""
-        file_path = os.path.join(os.path.dirname(__file__), 'insurance.json')
-        with open(file_path, 'r') as f:
-            return json.load(f)
-
-    def get(self, request):
-        """Return insurance plans from insurance.json."""
-        user_id = request.headers.get('User-Id')
-        if not user_id:
-            return Response({"error": "User-Id header is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            profile = UserProfile.objects.get(user__id=user_id)
-            plans = self.load_insurance_plans()
-            filtered_plans = [plan for plan in plans if plan["risk_level"] == profile.risk_tolerance]
-            return Response(filtered_plans if filtered_plans else plans)
-        except UserProfile.DoesNotExist:
-            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
-        except FileNotFoundError:
-            return Response({"error": "Insurance data file not found"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def post(self, request):
-        """Purchase an insurance plan and store it in the backend."""
-        user_id = request.data.get('user_id')
-        plan_id = request.data.get('plan_id')
-        quantity = int(request.data.get('quantity', 1))
-
-        if not all([user_id, plan_id]):
-            return Response({"error": "user_id and plan_id are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user_id = int(user_id)  # Ensure user_id is an integer
-            plan_id = int(plan_id)  # Ensure plan_id is an integer
-            profile = UserProfile.objects.get(user__id=user_id)
-            plans = self.load_insurance_plans()
-            plan = next((p for p in plans if p["id"] == plan_id), None)
-            if not plan:
-                return Response({"error": "Invalid plan_id"}, status=status.HTTP_400_BAD_REQUEST)
-
-            price = Decimal(plan["price"])
-            amount = price * quantity
-
-            if profile.balance < amount:
-                return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
-
-            asset, created = Asset.objects.get_or_create(
-                name=plan["name"],
-                defaults={
-                    "price": price,
-                    "asset_type": "insurance",
-                    "risk_level": plan["risk_level"]
-                }
-            )
-
-            profile.balance -= amount
-            profile.boughtsum += amount
-            profile.save()
-
-            Portfolio.objects.update_or_create(
-                user_profile=profile, asset=asset,
-                defaults={'quantity': models.F('quantity') + quantity}
-            )
-
-            transaction = Transaction.objects.create(
-                user_profile=profile, asset=asset, quantity=quantity,
-                transaction_type='buy', amount=amount
-            )
-            serializer = TransactionSerializer(transaction)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        except UserProfile.DoesNotExist:
-            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
-        except FileNotFoundError:
-            return Response({"error": "Insurance data file not found"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except ValueError:
-            return Response({"error": "Invalid quantity, user_id, or plan_id"}, status=status.HTTP_400_BAD_REQUEST)
-        
-class AssetListView(APIView):
-    def get(self, request):
-        assets = Asset.objects.all()
-        serializer = AssetSerializer(assets, many=True)
-        return Response(serializer.data)
+# Configure logging
+logger = logging.getLogger(__name__)
 
 class PortfolioView(APIView):
-    def get(self, request, id):
-        user_id = id  # Get user_id from headers
-        profile = UserProfile.objects.get(user__id=user_id)
-        print(profile)
-        portfolio = Portfolio.objects.filter(user_profile=profile)
-        print(portfolio)
-        serializer = PortfolioSerializer(portfolio, many=True)
-        return Response(serializer.data)
-
-class TransactionView(APIView):
     def get(self, request, id=None):
-        if not id:
-            return Response({"error": "User ID is required for GET requests"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             profile = UserProfile.objects.get(user__id=id)
-            transactions = Transaction.objects.filter(user_profile=profile)
-            serializer = TransactionSerializer(transactions, many=True)
+            portfolios = Portfolio.objects.filter(user_profile=profile)
+            serializer = PortfolioSerializer(portfolios, many=True)
             return Response(serializer.data)
         except UserProfile.DoesNotExist:
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class TransactionView(APIView):
+    def get(self, request, id=None):
+        logger.info(f"GET request received with id={id}")
+        if not id:
+            logger.error("User ID is required for GET requests")
+            return Response({"error": "User ID is required for GET requests"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            profile = UserProfile.objects.get(user__id=id)
+            logger.info(f"Found UserProfile for user_id={id}")
+            transactions = Transaction.objects.filter(user_profile=profile)
+            serializer = TransactionSerializer(transactions, many=True)
+            logger.info(f"Returning {len(serializer.data)} transactions for user_id={id}")
+            return Response(serializer.data)
+        except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile not found for user_id={id}")
+            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, id=None):
+        logger.info(f"POST request received with data: {request.data}")
+        
         user_id = request.data.get('user_id')
         if not user_id:
+            logger.error("user_id is missing in request data")
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             profile = UserProfile.objects.get(user__id=user_id)
-            asset = Asset.objects.get(id=request.data.get('asset_id'))
-            print("Profile:", profile, "Asset:", asset)
-            quantity = int(request.data.get('quantity', 0))
-            print("Quantity:", quantity, "Type:", type(quantity))
-            transaction_type = request.data.get('transaction_type')
-            print("Transaction Type:", transaction_type)
-            if not all([asset, quantity, transaction_type]):
-                return Response({"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.info(f"Found UserProfile for user_id={user_id}")
 
-            amount = asset.price * quantity
-            print("Amount:", amount, "Type:", type(amount))
-            
+            asset_symbol = request.data.get('asset_symbol')
+            price = request.data.get('price')
+            quantity = request.data.get('quantity', 0)
+            transaction_type = request.data.get('transaction_type')
+
+            logger.info(f"Parsed data: asset_symbol={asset_symbol}, price={price}, quantity={quantity}, transaction_type={transaction_type}")
+
+            if not all([asset_symbol, price, quantity, transaction_type]):
+                missing_fields = [field for field, value in {
+                    "asset_symbol": asset_symbol,
+                    "price": price,
+                    "quantity": quantity,
+                    "transaction_type": transaction_type
+                }.items() if not value]
+                logger.error(f"Missing required fields: {missing_fields}")
+                return Response({"error": f"Missing required fields: {missing_fields}"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Convert and validate price
+            try:
+                price = Decimal(str(price))
+                if price <= 0:
+                    logger.error(f"Invalid price: {price} (must be positive)")
+                    return Response({"error": "Price must be a positive number"}, status=status.HTTP_400_BAD_REQUEST)
+            except (ValueError, TypeError) as e:
+                logger.error(f"Failed to convert price '{price}' to Decimal: {str(e)}")
+                return Response({"error": f"Invalid price format: '{price}'"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Convert and validate quantity
+            try:
+                quantity = int(quantity)
+                if quantity <= 0:
+                    logger.error(f"Invalid quantity: {quantity} (must be positive)")
+                    return Response({"error": "Quantity must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+            except (ValueError, TypeError) as e:
+                logger.error(f"Failed to convert quantity '{quantity}' to int: {str(e)}")
+                return Response({"error": f"Invalid quantity format: '{quantity}'"}, status=status.HTTP_400_BAD_REQUEST)
+
+            amount = price * quantity
+            logger.info(f"Calculated amount: {amount}")
+
             if transaction_type == 'buy':
-                print("Entering buy logic")
                 if profile.balance < amount:
+                    logger.error(f"Insufficient balance: {profile.balance} < {amount}")
                     return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 profile.balance -= amount
                 profile.boughtsum += amount
-                if asset.asset_type == 'stock':
-                    profile.stocks += amount
-                elif asset.asset_type == 'bond':
-                    profile.bonds += amount
-                elif asset.asset_type == 'insurance':
-                    profile.insurance += amount
-                print("Before Portfolio create")
-                Portfolio.objects.update_or_create(
-                    user_profile=profile,  # Fixed: Use profile instance
-                    asset=asset,           # Fixed: Use asset instance
-                    quantity=quantity
-                )
-                print("After Portfolio create")
-            elif transaction_type == 'sell':
-                print("Entering sell logic")
+                profile.stocks += amount
+                logger.info(f"Buying {quantity} of {asset_symbol} at {price} for {amount}")
+
+                # Check if Portfolio exists, create or update accordingly
                 try:
-                    portfolio = Portfolio.objects.get(user_profile=profile, asset=asset)
+                    portfolio = Portfolio.objects.get(user_profile=profile, asset_symbol=asset_symbol)
+                    logger.info(f"Found existing portfolio for {asset_symbol}, updating quantity")
+                    portfolio.quantity = models.F('quantity') + quantity
+                    portfolio.save()
+                except Portfolio.DoesNotExist:
+                    logger.info(f"No portfolio found for {asset_symbol}, creating new entry")
+                    Portfolio.objects.create(
+                        user_profile=profile,
+                        asset_symbol=asset_symbol,
+                        quantity=quantity
+                    )
+
+            elif transaction_type == 'sell':
+                try:
+                    portfolio = Portfolio.objects.get(user_profile=profile, asset_symbol=asset_symbol)
                     if portfolio.quantity < quantity:
+                        logger.error(f"Not enough assets to sell: {portfolio.quantity} < {quantity}")
                         return Response({"error": "Not enough assets to sell"}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    # Calculate profit/loss
+                    buy_transactions = Transaction.objects.filter(
+                        user_profile=profile, asset_symbol=asset_symbol, transaction_type='buy'
+                    ).order_by('created_at')
+                    remaining_quantity = quantity
+                    total_buy_cost = Decimal('0.00')
+                    
+                    for buy in buy_transactions:
+                        if remaining_quantity <= 0:
+                            break
+                        qty_to_use = min(remaining_quantity, buy.quantity)
+                        total_buy_cost += qty_to_use * buy.price
+                        remaining_quantity -= qty_to_use
+                    
+                    profit_loss = (amount - total_buy_cost).quantize(Decimal('0.01'))
+                    logger.info(f"Selling {quantity} of {asset_symbol} at {price} for {amount}. Profit/Loss: {profit_loss}")
+
                     profile.balance += amount
                     profile.boughtsum -= amount
-                    if asset.asset_type == 'stock':  # Fixed: Use asset.asset_type (not asset.type)
-                        profile.stocks -= amount
-                    elif asset.asset_type == 'bond':  # Fixed: Use asset.asset_type
-                        profile.bonds -= amount
-                    elif asset.asset_type == 'insurance':  # Fixed: Use asset.asset_type
-                        profile.insurance -= amount
+                    profile.stocks -= amount
                     portfolio.quantity -= quantity
                     if portfolio.quantity == 0:
                         portfolio.delete()
+                        logger.info(f"Deleted portfolio entry for {asset_symbol}")
                     else:
                         portfolio.save()
+                        logger.info(f"Updated portfolio quantity for {asset_symbol} to {portfolio.quantity}")
+
                 except Portfolio.DoesNotExist:
+                    logger.error(f"Portfolio entry not found for {asset_symbol}")
                     return Response({"error": "Portfolio entry not found"}, status=status.HTTP_404_NOT_FOUND)
             else:
+                logger.error(f"Invalid transaction_type: {transaction_type}")
                 return Response({"error": "Invalid transaction_type"}, status=status.HTTP_400_BAD_REQUEST)
 
-            print("Before profile save")
+            if profile.boughtsum < 0:
+                profile.boughtsum = 0
+            if profile.stocks < 0:
+                profile.stocks = 0
+
             profile.save()
-            print("After profile save")
-            print("Before Transaction create")
+            logger.info(f"Updated UserProfile: balance={profile.balance}, boughtsum={profile.boughtsum}, stocks={profile.stocks}")
+
             transaction = Transaction.objects.create(
-                user_profile=profile,  # Already correct
-                asset=asset,           # Already correct
-                quantity=quantity,
-                transaction_type=transaction_type,
-                amount=amount
+                user_profile=profile, asset_symbol=asset_symbol, quantity=quantity,
+                transaction_type=transaction_type, price=price, amount=amount
             )
-            print("After Transaction create")
             serializer = TransactionSerializer(transaction)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            logger.info(f"Created transaction: {transaction}")
+
+            response_data = serializer.data
+            if transaction_type == 'sell':
+                response_data['profit_loss'] = str(profit_loss)
+                logger.info(f"Added profit_loss to response: {profit_loss}")
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
+
         except UserProfile.DoesNotExist:
+            logger.error(f"UserProfile not found for user_id={user_id}")
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
-        except Asset.DoesNotExist:
-            return Response({"error": "Asset not found"}, status=status.HTTP_404_NOT_FOUND)
-        except ValueError as e:
-            print("ValueError caught:", str(e))
-            return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
-        
-class SuggestionView(APIView):
-    def get(self, request):
-        user_id = request.headers.get('User-Id')
-        profile = UserProfile.objects.get(user__id=user_id)
-        assets = Asset.objects.filter(risk_level=profile.risk_tolerance)
-        serializer = AssetSerializer(assets, many=True)
-        return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            return Response({"error": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SentimentAnalysisView(APIView):
     def get(self, request):

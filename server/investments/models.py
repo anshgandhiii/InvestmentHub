@@ -1,26 +1,23 @@
 from django.db import models
 from account.models import UserProfile
-
-class Asset(models.Model):
-    ASSET_TYPES = [('stock', 'Stock'), ('bond', 'Bond'), ('insurance', 'Insurance')]    
-    name = models.CharField(max_length=100)
-    asset_type = models.CharField(max_length=10, choices=ASSET_TYPES)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    risk_level = models.CharField(max_length=10, choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')])
-
-    def __str__(self):
-        return self.name
+from django.contrib.auth.models import User
 
 class Portfolio(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=0)
-    purchase_date = models.DateTimeField(auto_now_add=True)
+    asset_symbol = models.CharField(max_length=10)  # e.g., "IBM"
+    quantity = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user_profile} - {self.asset_symbol}"
 
 class Transaction(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    asset_symbol = models.CharField(max_length=10)  # e.g., "IBM"
     quantity = models.IntegerField()
     transaction_type = models.CharField(max_length=4, choices=[('buy', 'Buy'), ('sell', 'Sell')])
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
-    date = models.DateTimeField(auto_now_add=True)
+    price = models.DecimalField(max_digits=15, decimal_places=2)  # Price at transaction time
+    amount = models.DecimalField(max_digits=15, decimal_places=2)  # Total cost/value
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_profile} - {self.transaction_type} {self.quantity} of {self.asset_symbol} at {self.price}"

@@ -168,10 +168,10 @@ def fetch_financial_risk_indicators(ticker: str):
 # forex_df = fetch_forex_rates("EURUSD=X", "1mo")
 # print(forex_df.head())
  
-# Example usage:
-# df = fetch_stock_prices("AMZN", "1wk")
-# print(df.head())
-# print(df)
+Example usage:
+df = fetch_stock_prices("AMZN", "1wk")
+print(df.head())
+print(df)
 
 # index_df = fetch_market_indices("^GDAXI", "1mo")
 # print(index_df.head())

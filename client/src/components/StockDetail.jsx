@@ -15,6 +15,7 @@ export function StockDetail() {
   const [currentTimestampIndex, setCurrentTimestampIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
   const stocks = stockData.stocks;
   const stock = stocks.find((s) => s["Meta Data"]["2. Symbol"] === symbol);
   const userId = localStorage.getItem("user_id");
@@ -39,7 +40,7 @@ export function StockDetail() {
         setCurrentPrices(newPrices);
         return nextIndex;
       });
-    }, 10000);
+    }, 5000); // Update every 5 seconds for simulated real-time feel
 
     return () => clearInterval(interval);
   }, [stocks, stock]);
@@ -74,7 +75,7 @@ export function StockDetail() {
     datasets: [{
       label: `${symbol} Price (₹)`,
       data: timestamps.slice(0, 20).map((ts) => parseFloat(stock["Time Series (5min)"][ts]["4. close"])),
-      borderColor: "#4f46e5", // Indigo
+      borderColor: "#4f46e5",
       backgroundColor: "rgba(79, 70, 229, 0.1)",
       fill: true,
       tension: 0.4,
@@ -86,14 +87,8 @@ export function StockDetail() {
   const chartOptions = {
     maintainAspectRatio: false,
     scales: {
-      x: { 
-        grid: { display: false },
-        title: { display: true, text: "Time", font: { size: 14, weight: "bold" } },
-      },
-      y: { 
-        grid: { color: "rgba(0, 0, 0, 0.05)" },
-        title: { display: true, text: "Price (₹)", font: { size: 14, weight: "bold" } },
-      },
+      x: { grid: { display: false }, title: { display: true, text: "Time", font: { size: 14, weight: "bold" } } },
+      y: { grid: { color: "rgba(0, 0, 0, 0.05)" }, title: { display: true, text: "Price (₹)", font: { size: 14, weight: "bold" } } },
     },
     plugins: {
       legend: { display: true, position: "top", labels: { font: { size: 12 } } },
@@ -103,25 +98,33 @@ export function StockDetail() {
 
   const handleBuySell = async (action) => {
     if (!userId) {
-      alert("Please log in to perform this action.");
+      setMessage("Please log in to perform this action.");
       return;
     }
     setIsSubmitting(true);
+    setMessage("");
+
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/investment/transactions/${userId}`,
+        "http://127.0.0.1:8000/investment/transactions/",
         {
-          transaction_type: action,
+          user_id: userId,
           asset_symbol: symbol,
-          amount: stockInfo.price * quantity,
-          quantity,
+          price: stockInfo.price,  // Send current price from stocks.json
+          quantity: quantity,
+          transaction_type: action,
         },
-        { headers: { "User-Id": userId }, withCredentials: true }
+        { headers: { "User-Id": userId, "Content-Type": "application/json" } }
       );
-      alert(`${action.toUpperCase()} successful: ${quantity} shares of ${symbol} at ₹${stockInfo.price}`);
+
+      const successMsg = action === "buy"
+        ? `Successfully bought ${quantity} shares of ${symbol} at ₹${stockInfo.price}`
+        : `Successfully sold ${quantity} shares of ${symbol} at ₹${stockInfo.price}. Profit/Loss: ₹${response.data.profit_loss}`;
+      setMessage(successMsg);
     } catch (error) {
       console.error(`${action} error:`, error);
-      alert(`Failed to ${action} ${symbol}: ${error.response?.data?.error || error.message}`);
+      const errorMsg = error.response?.data?.error || error.message;
+      setMessage(`Failed to ${action} ${symbol}: ${errorMsg}`);
     } finally {
       setIsSubmitting(false);
       setQuantity(1);
@@ -141,7 +144,7 @@ export function StockDetail() {
       {/* Header */}
       <header className="mb-8 text-center">
         <h2 className="text-4xl font-bold text-gray-900 tracking-tight">{symbol}</h2>
-        <p className="text-gray-500 mt-1 text-lg">Real-Time Stock Insights</p>
+        <p className="text-gray-500 mt-1 text-lg">Stock Market Insights</p>
       </header>
 
       {/* Main Content */}
@@ -174,7 +177,7 @@ export function StockDetail() {
               <li><span className="font-medium text-gray-800">Information:</span> {stock["Meta Data"]["1. Information"]}</li>
               <li><span className="font-medium text-gray-800">Last Refreshed:</span> {stock["Meta Data"]["3. Last Refreshed"]}</li>
               <li><span className="font-medium text-gray-800">Interval:</span> {stock["Meta Data"]["4. Interval"]}</li>
-              <li><span className="font-medium text-gray-800">Time Zone:</span> {stock["Meta Data"]["5. Time Zone"]}</li>
+              <li><span className="font-medium text-gray-800">Time Zone:</span> {stock["Meta Data"]["6. Time Zone"]}</li>
             </ul>
           </div>
           <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300">
@@ -247,8 +250,13 @@ export function StockDetail() {
             </button>
           </div>
           <p className="mt-3 text-sm text-gray-500">
-            Total Cost: <span className="font-medium text-gray-800">₹{(stockInfo.price * quantity).toFixed(2)}</span>
+            Total Cost/Value: <span className="font-medium text-gray-800">₹{(stockInfo.price * quantity).toFixed(2)}</span>
           </p>
+          {message && (
+            <p className={`mt-3 text-sm ${message.includes("Failed") ? "text-red-600" : "text-green-600"} font-medium`}>
+              {message}
+            </p>
+          )}
         </div>
 
         {/* Back Button */}

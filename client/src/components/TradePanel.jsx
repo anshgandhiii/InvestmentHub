@@ -12,9 +12,10 @@ export function TradePanel() {
 
   // Dynamic price updates
   useEffect(() => {
-    const timestamps = Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse();
+    const timestamps = Object.keys(stocks[0]["Time Series (5min)"]).sort(); // Sort timestamps in chronological order
     const interval = setInterval(() => {
       setCurrentTimestampIndex((prevIndex) => {
+        // Use the modulus operator to ensure index cycles back to 0 once it reaches the end
         const nextIndex = (prevIndex + 1) % timestamps.length;
         const newPrices = {};
         stocks.forEach((stock) => {
@@ -23,7 +24,7 @@ export function TradePanel() {
         setCurrentPrices(newPrices);
         return nextIndex;
       });
-    }, 10000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [stocks]);
@@ -34,7 +35,7 @@ export function TradePanel() {
     if (!symbol || !currentPrices[symbol]) {
       return { price: "N/A", trend: null, change: "0.00", volume: "N/A", high: "N/A", low: "N/A", open: "N/A", percentChange: "0.00" };
     }
-    const timestamps = Object.keys(stock["Time Series (5min)"]).sort().reverse();
+    const timestamps = Object.keys(stock["Time Series (5min)"]).sort(); // Sort timestamps in chronological order
     const currentPrice = parseFloat(currentPrices[symbol]);
     const prevPrice = parseFloat(
       stock["Time Series (5min)"][timestamps[currentTimestampIndex - 1] || timestamps[0]]["4. close"]
@@ -154,7 +155,7 @@ export function TradePanel() {
         <p className="text-sm text-gray-500">
           Last Updated:{" "}
           {stocks.length > 0 &&
-            Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse()[currentTimestampIndex]}
+            Object.keys(stocks[0]["Time Series (5min)"]).sort()[currentTimestampIndex]} {/* Sorted in order */}
         </p>
       </footer>
     </div>
