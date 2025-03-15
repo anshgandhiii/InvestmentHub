@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, ProfileSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer as ProfileSerializer
 from .models import UserProfile as Profile
 
 class UserRegistrationView(APIView):
@@ -36,3 +36,5 @@ class UserProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
