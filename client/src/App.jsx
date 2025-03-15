@@ -7,7 +7,8 @@ import LandingPage from "./components/Landing";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import { StockDetail } from "./components/StockDetail";
-import PrivateRoute from "./components/PrivateRoute"; // adjust the path as needed
+import PrivateRoute from "./components/PrivateRoute"; 
+import Logout from "./components/Logout";
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="stock/:symbol" element={<StockDetail />} />
-        
+        <Route path="/logout" element={<Logout />} />
+
         {/* Protected routes wrapped inside Layout */}
         <Route path="/" element={<Layout />}>
           <Route
