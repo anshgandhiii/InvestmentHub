@@ -17,7 +17,4 @@ python -m pip install Pillow
 
 # .env in project server:
 
-EMAIL_USER = 'dipjain90@gmail.com'
-EMAIL_PASSWORD = 'lthjchfgpisqjyre'
-EMAIL_FROM = 'dipjain90@gmail.com'
 
