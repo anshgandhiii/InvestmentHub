@@ -1,0 +1,85 @@
+.stock-news-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .filter-form {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .filter-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .filter-form input,
+  .filter-form select {
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .news-list {
+    margin-top: 20px;
+  }
+  
+  .news-card {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .news-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .news-title:hover {
+    text-decoration: underline;
+  }
+  
+  .news-summary {
+    margin-top: 10px;
+    color: #555;
+  }
+  
+  .news-date {
+    display: block;
+    margin-top: 10px;
+    color: #888;
+  }
+  
+  .loading,
+  .error,
+  .no-news {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .error {
+    color: red;
+  }
