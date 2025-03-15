@@ -3,7 +3,7 @@ import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartP
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import { InvestmentSuggestions } from "./InvestmentSuggessions";
-import SipCalculator from "./SipCalculator"
+import SipCalculator from "./SipCalculator";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -15,22 +15,15 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
-        // Fetch portfolio data
         const portfolioResponse = await axios.get(`http://127.0.0.1:8000/investment/portfolio/${userId}/`, {
           headers: { "User-Id": userId },
         });
-        // Fetch profile data
         const profileResponse = await axios.get(`http://127.0.0.1:8000/user/profile/${userId}`, {
           headers: { "User-Id": userId },
-        });
-        // Fetch transaction history to calculate initial investment
-        const transactionsResponse = await axios.get(`http://127.0.0.1:8000/investment/transactions/${userId}`, {
-          headers: { "User-Id": userId }, // Adjust if POST is required
         });
 
         const portfolioData = portfolioResponse.data;
         const profileData = profileResponse.data;
-        const transactionsData = transactionsResponse.data;
 
         // Calculate current portfolio values
         const totalPortfolio = portfolioData.reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
@@ -44,17 +37,10 @@ export default function Dashboard() {
           .filter((item) => item.asset.type === "insurance")
           .reduce((sum, item) => sum + item.asset.price * item.quantity, 0);
 
-        // Calculate initial investment from transactions (excluding deposits)
-        const initialInvestment = transactionsData.reduce((sum, tx) => {
-          if (tx.transaction_type === "buy") {
-            return sum + tx.amount; // Add cost of purchases
-          } else if (tx.transaction_type === "sell") {
-            return sum - tx.amount; // Subtract proceeds from sales
-          }
-          return sum; // Ignore deposits or other types
-        }, 0) || 30000; // Fallback to 30k if no transactions
+        // Use boughtsum as the initial investment for trend calculation
+        const boughtsum = parseFloat(profileData.boughtsum) || 0;
 
-        // Calculate dynamic trends (profit/loss percentage)
+        // Calculate dynamic trends based on boughtsum
         const calculateTrend = (currentValue, initialValue) => {
           if (initialValue === 0) return { percentage: "0.0%", direction: "neutral" };
           const change = ((currentValue - initialValue) / initialValue) * 100;
@@ -64,10 +50,11 @@ export default function Dashboard() {
           };
         };
 
-        const portfolioTrend = calculateTrend(totalPortfolio, initialInvestment);
-        const stocksTrend = calculateTrend(stocksValue, initialInvestment * 0.6); // Assume 60% initial allocation
-        const bondsTrend = calculateTrend(bondsValue, initialInvestment * 0.3);  // Assume 30% initial allocation
-        const insuranceTrend = calculateTrend(insuranceValue, initialInvestment * 0.1); // Assume 10% initial allocation
+        // Assume initial allocation proportions if boughtsum is non-zero (simplified)
+        const portfolioTrend = calculateTrend(totalPortfolio, boughtsum);
+        const stocksTrend = calculateTrend(stocksValue, boughtsum * 0.6); // 60% initial allocation assumption
+        const bondsTrend = calculateTrend(bondsValue, boughtsum * 0.3);  // 30% initial allocation assumption
+        const insuranceTrend = calculateTrend(insuranceValue, boughtsum * 0.1); // 10% initial allocation assumption
 
         const summary = [
           {
