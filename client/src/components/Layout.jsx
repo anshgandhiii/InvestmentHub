@@ -180,7 +180,7 @@ export function Layout() {
       {/* Footer */}
       <footer className="footer p-6 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white w-full">
         <div className="flex flex-col sm:flex-row items-center justify-between w-full max-w-7xl mx-auto">
-          <p className="text-sm font-medium">© 2025 InvestPro</p>
+          <p className="text-sm font-medium">© 2025 InvestmentHub</p>
           <div className="flex gap-6 mt-4 sm:mt-0">
             <button className="text-sm hover:underline">Terms</button>
             <button className="text-sm hover:underline">Privacy</button>
