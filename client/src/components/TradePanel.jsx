@@ -4,83 +4,15 @@ import { FaSearch, FaArrowUp, FaArrowDown, FaInfoCircle } from "react-icons/fa";
 
 // Simulated data for Stocks, Bonds, and Insurances
 import stockData from "../stocks.json"; // Ensure path is correct
-
-// Placeholder Bonds data
-const bondsData = {
-  bonds: [
-    {
-      "Meta Data": {
-        "1. Information": "Bond Data",
-        "2. Symbol": "BOND1",
-        "3. Last Refreshed": "2025-03-15 16:00:00",
-        "4. Interval": "5min",
-        "5. Time Zone": "US/Eastern",
-      },
-      "Time Series (5min)": {
-        "2025-03-15 16:00:00": { "1. yield": "3.50", "2. high": "3.55", "3. low": "3.45", "4. price": "100.50", "5. volume": "5000" },
-        "2025-03-15 15:55:00": { "1. yield": "3.48", "2. high": "3.50", "3. low": "3.40", "4. price": "100.30", "5. volume": "4800" },
-      },
-    },
-    {
-      "Meta Data": {
-        "1. Information": "Bond Data",
-        "2. Symbol": "BOND2",
-        "3. Last Refreshed": "2025-03-15 16:00:00",
-        "4. Interval": "5min",
-        "5. Time Zone": "US/Eastern",
-      },
-      "Time Series (5min)": {
-        "2025-03-15 16:00:00": { "1. yield": "4.20", "2. high": "4.25", "3. low": "4.15", "4. price": "99.80", "5. volume": "7000" },
-        "2025-03-15 15:55:00": { "1. yield": "4.18", "2. high": "4.20", "3. low": "4.10", "4. price": "99.60", "5. volume": "6800" },
-      },
-    },
-  ],
-};
-
-// Updated Insurances data (static, no time series)
-const insurancesData = {
-  insurances: [
-    {
-      "Meta Data": {
-        "1. Information": "Insurance Policy Data",
-        "2. Symbol": "INS1",
-        "3. Last Refreshed": "2025-03-15 16:00:00",
-        "4. Time Zone": "US/Eastern",
-      },
-      "Policy Details": {
-        "category": "Property",
-        "price": "2496.17", // Premium price
-        "risk_level": "Medium",
-        "term": "29 years",
-        "premium": "Annually",
-        "coverage": "507217.44",
-      },
-    },
-    {
-      "Meta Data": {
-        "1. Information": "Insurance Policy Data",
-        "2. Symbol": "INS2",
-        "3. Last Refreshed": "2025-03-15 16:00:00",
-        "4. Time Zone": "US/Eastern",
-      },
-      "Policy Details": {
-        "category": "Property",
-        "price": "3000.00",
-        "risk_level": "High",
-        "term": "25 years",
-        "premium": "Annually",
-        "coverage": "600000.00",
-      },
-    },
-  ],
-};
+import bondsData from "../bonds.json";
+import insurancesData from "../insurance.json";
 
 export function TradePanel() {
   const [currentPrices, setCurrentPrices] = useState({});
   const [currentTimestampIndex, setCurrentTimestampIndex] = useState(0);
   const [stocks] = useState(stockData.stocks);
-  const [bonds] = useState(bondsData.bonds);
-  const [insurances] = useState(insurancesData.insurances);
+  const [bonds] = useState(bondsData); // Use the imported JSON data
+  const [insurances] = useState(insurancesData);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("stocks");
   const [filterCategory, setFilterCategory] = useState("");
@@ -102,9 +34,9 @@ export function TradePanel() {
         initialPrices[bond["Meta Data"]["2. Symbol"]] = bond["Time Series (5min)"][bondTimestamps[0]]["4. price"];
       }
     });
-    // Insurances are static, so just set their price once
+    // Set initial prices for insurances
     insurances.forEach((insurance) => {
-      initialPrices[insurance["Meta Data"]["2. Symbol"]] = insurance["Policy Details"]["price"];
+      initialPrices[insurance.name] = insurance.price;
     });
     setCurrentPrices(initialPrices);
 
@@ -127,9 +59,9 @@ export function TradePanel() {
           newPrices[bond["Meta Data"]["2. Symbol"]] = bond["Time Series (5min)"][timestamp]["4. price"];
         });
 
-        // Insurances remain static, so copy their current price
+        // Insurances remain static
         insurances.forEach((insurance) => {
-          newPrices[insurance["Meta Data"]["2. Symbol"]] = insurance["Policy Details"]["price"];
+          newPrices[insurance.name] = insurance.price;
         });
 
         setCurrentPrices(newPrices);
@@ -158,7 +90,7 @@ export function TradePanel() {
     const high = parseFloat(currentData["2. high"]).toFixed(2);
     const low = parseFloat(currentData["3. low"]).toFixed(2);
     const open = parseFloat(currentData["1. open"]).toFixed(2);
-    const percentChange = prevPrice ? ((currentPrice - prevPrice) / prevPrice * 100).toFixed(2) : "0.00";
+    const percentChange = prevPrice ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(2) : "0.00";
 
     return { price: currentPrice.toFixed(2), trend, change, volume, high, low, open, percentChange };
   };
@@ -179,13 +111,13 @@ export function TradePanel() {
     const yieldRate = currentData["1. yield"];
     const high = parseFloat(currentData["2. high"]).toFixed(2);
     const low = parseFloat(currentData["3. low"]).toFixed(2);
-    const percentChange = prevPrice ? ((currentPrice - prevPrice) / prevPrice * 100).toFixed(2) : "0.00";
+    const percentChange = prevPrice ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(2) : "0.00";
 
     return { price: currentPrice.toFixed(2), trend, change, yield: yieldRate, high, low, percentChange };
   };
 
   const getInsuranceInfo = (insurance) => {
-    const symbol = insurance["Meta Data"]["2. Symbol"];
+    const symbol = insurance.name;
     if (!symbol || !currentPrices[symbol]) {
       return {
         price: "N/A",
@@ -196,11 +128,10 @@ export function TradePanel() {
       };
     }
     const price = parseFloat(currentPrices[symbol]).toFixed(2);
-    const policyDetails = insurance["Policy Details"];
-    const riskLevel = policyDetails["risk_level"];
-    const term = policyDetails["term"];
-    const premium = policyDetails["premium"];
-    const coverage = parseFloat(policyDetails["coverage"]).toFixed(2);
+    const riskLevel = insurance.risk_level;
+    const term = `${insurance.term_years} years`;
+    const premium = insurance.premium_frequency;
+    const coverage = parseFloat(insurance.coverage_amount).toFixed(2);
 
     return { price, riskLevel, term, premium, coverage };
   };
@@ -213,8 +144,8 @@ export function TradePanel() {
     bond["Meta Data"]["2. Symbol"].toLowerCase().includes(searchQuery.toLowerCase())
   );
   const filteredInsurances = insurances.filter((insurance) => {
-    const matchesSearch = insurance["Meta Data"]["2. Symbol"].toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !filterCategory || insurance["Policy Details"]["category"].toLowerCase() === filterCategory.toLowerCase();
+    const matchesSearch = insurance.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !filterCategory || insurance.category.toLowerCase() === filterCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
@@ -225,8 +156,8 @@ export function TradePanel() {
   const handleBondClick = (bondSymbol) => {
     navigate(`/bond/${bondSymbol}`);
   };
-  const handleInsuranceClick = (insuranceSymbol) => {
-    navigate(`/insurance/${insuranceSymbol}`);
+  const handleInsuranceClick = (insuranceName) => {
+    navigate(`/insurance/${insuranceName}`);
   };
 
   return (
@@ -292,7 +223,7 @@ export function TradePanel() {
               </button>
             </div>
 
-            {/* Insurance Category Filter (visible only for Insurances tab) */}
+            {/* Insurance Category Filter */}
             {activeTab === "insurances" && (
               <div className="mt-4">
                 <select
@@ -301,8 +232,8 @@ export function TradePanel() {
                   className="w-full max-w-xs p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
                 >
                   <option value="">All Categories</option>
-                  <option value="Property">Property</option>
-                  {/* Add more categories as needed */}
+                  <option value="health">Health</option>
+                  <option value="life">Life</option>
                 </select>
               </div>
             )}
@@ -310,7 +241,7 @@ export function TradePanel() {
 
           {/* Tab Content */}
           <div className="overflow-x-auto max-h-[70vh] overflow-y-auto">
-          {activeTab === "stocks" && (
+            {activeTab === "stocks" && (
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50 text-gray-700 sticky top-0 z-10 shadow-sm">
                   <tr>
@@ -428,7 +359,7 @@ export function TradePanel() {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50 text-gray-700 sticky top-0 z-10 shadow-sm">
                   <tr>
-                    <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Symbol</th>
+                    <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Name</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Price (₹)</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Risk Level</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Term</th>
@@ -441,13 +372,13 @@ export function TradePanel() {
                     const { price, riskLevel, term, premium, coverage } = getInsuranceInfo(insurance);
                     return (
                       <tr
-                        key={insurance["Meta Data"]["2. Symbol"]}
+                        key={insurance.name}
                         className={`${
                           index % 2 === 0 ? "bg-white" : "bg-gray-50"
                         } hover:bg-indigo-100 cursor-pointer transition-all duration-200`}
-                        onClick={() => handleInsuranceClick(insurance["Meta Data"]["2. Symbol"])}
+                        onClick={() => handleInsuranceClick(insurance.name)}
                       >
-                        <td className="py-4 px-6 font-medium text-gray-800">{insurance["Meta Data"]["2. Symbol"]}</td>
+                        <td className="py-4 px-6 font-medium text-gray-800">{insurance.name}</td>
                         <td className="py-4 px-6 font-semibold text-gray-900">₹{price}</td>
                         <td className="py-4 px-6 text-gray-700">{riskLevel}</td>
                         <td className="py-4 px-6 text-gray-700">{term}</td>
@@ -468,7 +399,7 @@ export function TradePanel() {
         <p className="text-sm text-gray-500">
           Last Updated:{" "}
           {stocks.length > 0 &&
-            Object.keys(stocks[0]["Time Series (5min)"]).sort()[currentTimestampIndex]} {/* Sorted in order */}
+            Object.keys(stocks[0]["Time Series (5min)"]).sort()[currentTimestampIndex]}
         </p>
       </footer>
     </div>
