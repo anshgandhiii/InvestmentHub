@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
-import { InvestmentSuggestions } from "./InvestmentSuggessions";
+import InvestmentSuggestions from "./InvestmentSuggessions"
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
 import stockData from "../stocks.json"; // Import stocks.json
@@ -33,6 +33,8 @@ ChartJS.register(
   ArcElement,
   Filler
 );
+import stockData from "../stocks.json"; 
+import { FaCoins } from "react-icons/fa";
 
 export default function Dashboard() {
   const userId = localStorage.getItem("user_id"); // Moved up
@@ -199,7 +201,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (loading || !portfolioData.length) return;
 
-    const timestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse() : [];
+    const timestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse() : [];
     if (!timestamps.length) return;
 
     const interval = setInterval(() => {
@@ -379,6 +381,11 @@ export default function Dashboard() {
                 <button className="btn btn-sm btn-outline btn-primary" onClick={handleAddFunds}>
                   Add Funds
                 </button>
+              <h3 className="text-lg font-semibold flex items-center">
+                  <FaCoins className="mr-2" />
+                  Account Balance
+                </h3>
+                <button className="btn btn-sm btn-outline">Add Funds</button>
               </div>
               <p className="text-xl font-bold">
                 ${profile.balance

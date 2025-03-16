@@ -20,13 +20,13 @@ export function TradePanel() {
 
   // Dynamic price updates for Stocks and Bonds (excluding Insurances)
   useEffect(() => {
-    const stockTimestamps = stocks[0] ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse() : [];
+    const stockTimestamps = stocks[0] ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse() : [];
     const bondTimestamps = bonds[0] ? Object.keys(bonds[0]["Time Series (5min)"]).sort().reverse() : [];
 
     const initialPrices = {};
     stocks.forEach((stock) => {
       if (stockTimestamps[0]) {
-        initialPrices[stock["Meta Data"]["2. Symbol"]] = stock["Time Series (5min)"][stockTimestamps[0]]["4. close"];
+        initialPrices[stock["Meta Data"]["2. Symbol"]] = stock["Time Series (60min)"][stockTimestamps[0]]["4. close"];
       }
     });
     bonds.forEach((bond) => {
@@ -45,12 +45,12 @@ export function TradePanel() {
         const nextIndex = prevIndex + 1;
         const newPrices = {};
 
-        // Update Stocks prices
         stocks.forEach((stock) => {
-          const timestamps = Object.keys(stock["Time Series (5min)"]).sort().reverse();
+          const timestamps = Object.keys(stock["Time Series (60min)"]).sort().reverse();
           const timestamp = timestamps[nextIndex % timestamps.length] || timestamps[0];
-          newPrices[stock["Meta Data"]["2. Symbol"]] = stock["Time Series (5min)"][timestamp]["4. close"];
+          newPrices[stock["Meta Data"]["2. Symbol"]] = stock["Time Series (60min)"][timestamp]["4. close"];
         });
+        
 
         // Update Bonds prices
         bonds.forEach((bond) => {
@@ -78,14 +78,14 @@ export function TradePanel() {
     if (!symbol || !currentPrices[symbol]) {
       return { price: "N/A", trend: null, change: "0.00", volume: "N/A", high: "N/A", low: "N/A", open: "N/A", percentChange: "0.00" };
     }
-    const timestamps = Object.keys(stock["Time Series (5min)"]).sort(); // Sort timestamps in chronological order
+    const timestamps = Object.keys(stock["Time Series (60min)"]).sort(); // Sort timestamps in chronological order
     const currentPrice = parseFloat(currentPrices[symbol]);
     const prevPrice = parseFloat(
-      stock["Time Series (5min)"][timestamps[currentTimestampIndex - 1] || timestamps[0]]["4. close"]
+      stock["Time Series (60min)"][timestamps[currentTimestampIndex - 1] || timestamps[0]]["4. close"]
     );
     const trend = currentPrice > prevPrice ? "up" : currentPrice < prevPrice ? "down" : "neutral";
     const change = (currentPrice - prevPrice).toFixed(2);
-    const currentData = stock["Time Series (5min)"][timestamps[currentTimestampIndex] || timestamps[0]];
+    const currentData = stock["Time Series (60min)"][timestamps[currentTimestampIndex] || timestamps[0]];
     const volume = currentData["5. volume"];
     const high = parseFloat(currentData["2. high"]).toFixed(2);
     const low = parseFloat(currentData["3. low"]).toFixed(2);

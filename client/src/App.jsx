@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import Dashboard from "./components/Dashboard";
+import VirtualMarket from "./components/VirtualMarket";
 import News from "./components/news";
 import Profile from "./components/Profile";
 import LandingPage from "./components/Landing";
@@ -47,6 +48,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="virtualMarket"
+            element={
+              <PrivateRoute>
+                <VirtualMarket />
               </PrivateRoute>
             }
           />

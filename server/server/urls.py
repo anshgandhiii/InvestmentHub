@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from agent.views import FinanceAgentView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('investment/', include('investments.urls')),
     path('user/', include('account.urls')),
+    path('api/finance-agent/', FinanceAgentView.as_view(), name='finance-agent'),
 ]
