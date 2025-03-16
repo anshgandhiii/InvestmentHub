@@ -11,6 +11,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Logout from "./components/Logout";
 import { BondDetail } from "./components/BondDetail";
 import { InsuranceDetail } from "./components/InsuranceDetail";
+import VirtualMarket from "./components/VirtualMarket"
 
 function App() {
   return (
@@ -31,6 +32,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="VirtualMarket"
+            element={
+              <PrivateRoute>
+                <VirtualMarket />
               </PrivateRoute>
             }
           />
