@@ -20,6 +20,8 @@ import {
   Legend,
   Filler,
 } from "chart.js";
+import myImage from "../assets/bse-fotor-ai-art-effects-20250316045844.jpeg.jpg";
+import stockData from "../stocks.json"; // Import the stock data
 
 // Register Chart.js components
 ChartJS.register(
@@ -289,6 +291,7 @@ export default function LandingPage() {
       return acc;
     }, {})
   );
+  const [tickerText, setTickerText] = useState(""); // State for the ticker text
   const navigate = useNavigate();
 
   // Load user session from localStorage
@@ -298,6 +301,83 @@ export default function LandingPage() {
       setUserId(storedUser);
     }
   }, []);
+
+  // Process stock data for the ticker
+  // Process stock data for the ticker
+  // Process stock data for the ticker
+useEffect(() => {
+  // Check if stockData and stockData.stocks exist
+  if (!stockData || !stockData.stocks || !Array.isArray(stockData.stocks)) {
+    console.error("Stock data not available or in unexpected format");
+    return;
+  }
+
+  const latestPrices = stockData.stocks.map((stock) => {
+    try {
+      const symbol = stock["Meta Data"]["2. Symbol"];
+      // Use the correct time series key that matches your data
+      const timeSeriesKey = Object.keys(stock).find(key => key.includes("Time Series"));
+      
+      if (!timeSeriesKey) {
+        console.error(`No time series data found for ${symbol}`);
+        return { symbol, price: "N/A", change: 0 };
+      }
+      
+      const timeSeries = stock[timeSeriesKey];
+      const sortedTimes = Object.keys(timeSeries).sort().reverse(); // Sort times in descending order
+      
+      if (sortedTimes.length === 0) {
+        console.error(`No time entries found for ${symbol}`);
+        return { symbol, price: "N/A", change: 0 };
+      }
+      
+      const latestTime = sortedTimes[0]; // Latest time
+      const previousTime = sortedTimes.length > 1 ? sortedTimes[1] : null; // Previous time if available
+      
+      const latestPrice = parseFloat(timeSeries[latestTime]["4. close"]).toFixed(2);
+      const previousPrice = previousTime ? parseFloat(timeSeries[previousTime]["4. close"]).toFixed(2) : latestPrice;
+      const priceChange = previousTime ? (parseFloat(latestPrice) - parseFloat(previousPrice)) : 0;
+      
+      return {
+        symbol,
+        price: latestPrice,
+        change: priceChange, // Positive for increase, negative for decrease, 0 if no previous data
+      };
+    } catch (error) {
+      console.error(`Error processing stock data:`, error);
+      return { symbol: "ERROR", price: "N/A", change: 0 };
+    }
+  });
+
+  // Filter out any error entries
+  const validPrices = latestPrices.filter(item => item.symbol !== "ERROR");
+  
+  if (validPrices.length === 0) {
+    setTickerText("No stock data available");
+    return;
+  }
+
+  // Create the ticker text with arrows (repeated for seamless scrolling)
+  const tickerElements = validPrices.map(({ symbol, price, change }) => {
+    const arrow = change > 0 ? "▲" : change < 0 ? "▼" : ""; // Add arrow based on price change
+    
+    // Match the exact colors in your screenshot:
+    // Green for positive changes, red for negative, gray/white for neutral
+    let color;
+    if (change > 0) {
+      color = "#2ecc71"; // Brighter green to match image
+    } else if (change < 0) {
+      color = "#e74c3c"; // Brighter red to match image
+    } else {
+      color = "#ffffff"; // White/gray for neutral
+    }
+    
+    return `<span style="color: ${color}">${symbol} $${price} ${arrow}</span>`;
+  });
+  
+  const tickerString = `${tickerElements.join(" &nbsp;&nbsp;&nbsp; ")} &nbsp;&nbsp;&nbsp; `;
+  setTickerText(tickerString.repeat(2)); // Repeat for smooth looping
+}, []);
 
   // Simulated login
   const handleLogin = () => {
@@ -395,6 +475,52 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-gray-50">
+      {/* Inline CSS for the ticker and image */}
+      <style>
+        {`
+          .image-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+            position: relative;
+          }
+
+          .building-image {
+            width: 100%;
+            height: auto;
+            display: block;
+          }
+
+          .ticker-band {
+            position: absolute;
+            top: 50%; /* Align with the horizontal patch */
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+            overflow: hidden;
+          }
+
+          .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            animation: scroll 15s linear infinite;
+          }
+
+          @keyframes scroll {
+            0% {
+              transform: translateX(100%);
+            }
+            100% {
+              transform: translateX(-100%);
+            }
+          }
+        `}
+      </style>
+
       {/* Navbar */}
       <nav className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg px-4 py-3 sticky top-0 z-20 w-full">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -507,29 +633,54 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-indigo-50 to-gray-50">
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
-          Take Control of Your Investments
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mb-8">
-          Manage your portfolio, track performance, and explore opportunities with InvestmentHub – your all-in-one financial dashboard.
-        </p>
-        <div className="flex gap-4">
-          <Link
-            to="/signup"
-            className="btn bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
-          >
-            Get Started <FaArrowRight />
-          </Link>
-          <Link
-            to="/dashboard"
-            className="btn bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300"
-          >
-            View Demo
-          </Link>
-        </div>
-      </section>
+      {/* Stock Ticker and Hero Section with Background Image */}
+<section className="w-full relative">
+  {/* Image as background */}
+  <div className="w-full relative" style={{ height: "600px" }}>
+    <div 
+      className="absolute inset-0 bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${myImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    />
+    
+    {/* Hero Text positioned in sky area */}
+    <div className="hero-content">
+    <h1 className="hero-title">
+      Take Control of Your Investments
+    </h1>
+    <p className="hero-subtitle">
+      Manage your portfolio, track performance, and explore opportunities with InvestmentHub
+    </p>
+    <div className="hero-buttons">
+      <Link
+        to="/signup"
+        className="btn primary-btn"
+      >
+        Get Started <FaArrowRight />
+      </Link>
+      <Link
+        to="/dashboard"
+        className="btn secondary-btn"
+      >
+        View Demo
+      </Link>
+    </div>
+  </div>
+  
+  {/* Ticker band positioned at the bottom of the building */}
+  <div className="ticker-container">
+    <div className="ticker-band">
+      <div
+        className="ticker"
+        dangerouslySetInnerHTML={{ __html: tickerText }}
+      />
+    </div>
+  </div>
+  </div>
+</section>
 
       {/* Market Indices Section */}
       <section className="py-12 bg-white">

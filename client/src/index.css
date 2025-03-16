@@ -1,1 +1,107 @@
 @import "tailwindcss";
+@import "tailwindcss";
+
+ 
+.hero-section {
+    position: relative;
+    height: 70vh;
+    background-image: url(${myImage});
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    position: absolute;
+    top: 22%;
+    right: 5%;
+    width: 45%;
+    text-align: left;
+    padding: 1rem;
+    z-index: 10;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #3b5ae8;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.125rem;
+    color: #3b5ae8;
+    margin-bottom: 2rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .primary-btn {
+    background-color: #3b5ae8;
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .primary-btn:hover {
+    background-color: #2a4ad8;
+  }
+
+  .secondary-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .secondary-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .ticker-container {
+    position: absolute;
+    bottom: 10px; /* Position at the bottom of the building */
+    width: 100%;
+    z-index: 15;
+  }
+
+  .ticker-band {
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 8px 0;
+    overflow: hidden;
+  }
+
+  .ticker {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    animation: scroll 15s linear infinite;
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .market-indices {
+    margin-top: 0;
+    padding-top: 2rem;
+    text-align: center;
+  }
