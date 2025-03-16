@@ -33,7 +33,6 @@ ChartJS.register(
   ArcElement,
   Filler
 );
-import stockData from "../stocks.json"; 
 import { FaCoins } from "react-icons/fa";
 
 export default function Dashboard() {
