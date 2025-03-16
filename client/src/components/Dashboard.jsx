@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
+import { FaChartLine, FaChartPie } from "react-icons/fa";
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
 import InvestmentSuggestions from "./InvestmentSuggessions"
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
-import stockData from "../stocks.json"; // Import stocks.json for current prices
 import { Line, Pie } from "react-chartjs-2";
+import stockData from "../stocks.json"; 
+import { FaCoins } from "react-icons/fa";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,8 +33,6 @@ ChartJS.register(
   ArcElement,
   Filler
 );
-import stockData from "../stocks.json"; 
-import { FaCoins } from "react-icons/fa";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
