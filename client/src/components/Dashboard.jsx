@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
-import InvestmentSuggestions from "./InvestmentSuggessions"
+import InvestmentSuggestions from "./InvestmentSuggessions";
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
 import stockData from "../stocks.json"; // Import stocks.json
@@ -33,10 +33,9 @@ ChartJS.register(
   ArcElement,
   Filler
 );
-import { FaCoins } from "react-icons/fa";
 
 export default function Dashboard() {
-  const userId = localStorage.getItem("user_id"); // Moved up
+  const userId = localStorage.getItem("user_id");
   const [activeTab, setActiveTab] = useState("overview");
   const [portfolioSummary, setPortfolioSummary] = useState([]);
   const [profile, setProfile] = useState({});
@@ -48,8 +47,8 @@ export default function Dashboard() {
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
   const [timeSlot, setTimeSlot] = useState("All");
-  const stocks = stockData.stocks;
-  const bonds = bondsData;
+  const stocks = stockData.stocks || [];
+  const bonds = bondsData || [];
 
   useEffect(() => {
     const fetchPortfolioData = async () => {
@@ -61,8 +60,8 @@ export default function Dashboard() {
           headers: { "User-Id": userId },
         });
 
-        const fetchedPortfolioData = portfolioResponse.data;
-        const profileData = profileResponse.data;
+        const fetchedPortfolioData = portfolioResponse.data || [];
+        const profileData = profileResponse.data || {};
 
         setPortfolioData(fetchedPortfolioData);
         setProfile(profileData);
@@ -75,62 +74,70 @@ export default function Dashboard() {
     };
 
     if (userId) fetchPortfolioData();
+    else setLoading(false);
   }, [userId]);
 
-  // Save performanceHistory to localStorage whenever it changes
   useEffect(() => {
     if (userId && performanceHistory.length > 0) {
       localStorage.setItem(`performanceHistory_${userId}`, JSON.stringify(performanceHistory));
     }
   }, [performanceHistory, userId]);
 
-  // Function to update portfolio summary and charts
   const updatePortfolioSummary = (portfolio, profileData, priceIndex) => {
-    const stockTimestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse() : [];
-    const bondTimestamps = bonds.length > 0 ? Object.keys(bonds[0]["Time Series (5min)"]).sort().reverse() : [];
+    const stockTimestamps =
+      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (60min)"]
+        ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse()
+        : [];
+    const bondTimestamps =
+      bonds.length > 0 && bonds[0] && bonds[0]["Time Series (5min)"]
+        ? Object.keys(bonds[0]["Time Series (5min)"]).sort().reverse()
+        : [];
 
-    // Get current prices for stocks and bonds
     const currentPrices = {};
     stocks.forEach((stock) => {
-      const symbol = stock["Meta Data"]["2. Symbol"];
-      currentPrices[symbol] = stockTimestamps[priceIndex]
-        ? parseFloat(stock["Time Series (5min)"][stockTimestamps[priceIndex]]["4. close"])
-        : 0;
+      if (stock && stock["Meta Data"]) {
+        const symbol = stock["Meta Data"]["2. Symbol"];
+        currentPrices[symbol] = stockTimestamps[priceIndex]
+          ? parseFloat(stock["Time Series (60min)"][stockTimestamps[priceIndex]]["4. close"])
+          : 0;
+      }
     });
     bonds.forEach((bond) => {
-      const symbol = bond["Meta Data"]["2. Symbol"];
-      currentPrices[symbol] = bondTimestamps[priceIndex]
-        ? parseFloat(bond["Time Series (5min)"][bondTimestamps[priceIndex]]["4. price"])
-        : 0;
+      if (bond && bond["Meta Data"]) {
+        const symbol = bond["Meta Data"]["2. Symbol"];
+        currentPrices[symbol] = bondTimestamps[priceIndex]
+          ? parseFloat(bond["Time Series (5min)"][bondTimestamps[priceIndex]]["4. price"])
+          : 0;
+      }
     });
 
-    // Calculate dynamic values
     const stocksValue = portfolio
-      .filter((item) => stocks.some((s) => s["Meta Data"]["2. Symbol"] === item.asset_symbol))
-      .reduce((sum, item) => sum + (currentPrices[item.asset_symbol] || 0) * item.quantity, 0);
+      ? portfolio
+          .filter((item) => stocks.some((s) => s && s["Meta Data"] && s["Meta Data"]["2. Symbol"] === item.asset_symbol))
+          .reduce((sum, item) => sum + (currentPrices[item.asset_symbol] || 0) * item.quantity, 0)
+      : 0;
 
     const bondsValue = portfolio
-      .filter((item) => bonds.some((b) => b["Meta Data"]["2. Symbol"] === item.asset_symbol))
-      .reduce((sum, item) => sum + (currentPrices[item.asset_symbol] || 0) * item.quantity, 0);
+      ? portfolio
+          .filter((item) => bonds.some((b) => b && b["Meta Data"] && b["Meta Data"]["2. Symbol"] === item.asset_symbol))
+          .reduce((sum, item) => sum + (currentPrices[item.asset_symbol] || 0) * item.quantity, 0)
+      : 0;
 
-    const insuranceValue = parseFloat(profileData.insurance) || 0;
-    const boughtsum = parseFloat(profileData.boughtsum) || 0;
-
+    const insuranceValue = parseFloat(profileData?.insurance) || 0;
+    const boughtsum = parseFloat(profileData?.boughtsum) || 0;
     const totalPortfolio = stocksValue + bondsValue + insuranceValue;
 
-    // Update performance history with timestamp
     setPerformanceHistory((prev) => {
       const now = Date.now();
       const lastTimestamp = prev.length > 0 ? prev[prev.length - 1].timestamp : now - 5000;
       const gap = now - lastTimestamp;
-      const minGap = 1000; // Minimum gap of 1 second
+      const minGap = 1000;
       if (gap >= minGap) {
         return [...prev, { timestamp: now, value: totalPortfolio }];
       }
-      return prev; // Skip if gap is too small
+      return prev;
     });
 
-    // Calculate trends
     const calculateTrend = (currentValue, initialValue) => {
       if (initialValue === 0) return { percentage: "0.0%", direction: "neutral" };
       const change = ((currentValue - initialValue) / initialValue) * 100;
@@ -141,11 +148,10 @@ export default function Dashboard() {
     };
 
     const portfolioTrend = calculateTrend(totalPortfolio, boughtsum);
-    const stocksTrend = calculateTrend(stocksValue, profileData.stocks_initial || profileData.stocks || stocksValue);
-    const bondsTrend = calculateTrend(bondsValue, profileData.bonds_initial || profileData.bonds || bondsValue);
+    const stocksTrend = calculateTrend(stocksValue, profileData?.stocks_initial || profileData?.stocks || stocksValue);
+    const bondsTrend = calculateTrend(bondsValue, profileData?.bonds_initial || profileData?.bonds || bondsValue);
     const insuranceTrend = { percentage: "0.0%", direction: "neutral" };
 
-    // Update portfolio summary
     const summary = [
       {
         title: "Portfolio",
@@ -196,11 +202,13 @@ export default function Dashboard() {
     setPortfolioSummary(summary);
   };
 
-  // Effect to simulate real-time price updates
   useEffect(() => {
     if (loading || !portfolioData.length) return;
 
-    const timestamps = stocks.length > 0 ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse() : [];
+    const timestamps =
+      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (60min)"]
+        ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse()
+        : [];
     if (!timestamps.length) return;
 
     const interval = setInterval(() => {
@@ -209,32 +217,39 @@ export default function Dashboard() {
         updatePortfolioSummary(portfolioData, profile, nextIndex);
         return nextIndex;
       });
-    }, 5000); // Update every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [loading, portfolioData, profile]);
 
-  // Filter performance data based on time slot
+  // Function to reset performance history
+  const resetPerformanceHistory = () => {
+    if (userId) {
+         // Clear from localStorage
+      setPerformanceHistory([]); // Reset state to empty array
+    }
+  };
+
   const filterPerformanceData = () => {
     const now = Date.now();
     let filteredHistory = performanceHistory;
 
     switch (timeSlot) {
       case "1H":
-        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 60 * 60 * 1000); // 1 hour
+        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 60 * 60 * 1000);
         break;
       case "1D":
-        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 24 * 60 * 60 * 1000); // 1 day
+        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 24 * 60 * 60 * 1000);
         break;
       case "1W":
-        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 7 * 24 * 60 * 60 * 1000); // 1 week
+        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 7 * 24 * 60 * 60 * 1000);
         break;
       case "1M":
-        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 30 * 24 * 60 * 60 * 1000); // 1 month
+        filteredHistory = performanceHistory.filter((entry) => now - entry.timestamp <= 30 * 24 * 60 * 60 * 1000);
         break;
       case "All":
       default:
-        filteredHistory = performanceHistory; // All data
+        filteredHistory = performanceHistory;
         break;
     }
 
@@ -250,7 +265,7 @@ export default function Dashboard() {
           backgroundColor: "rgba(79, 70, 229, 0.2)",
           borderColor: "rgba(79, 70, 229, 1)",
           borderWidth: 2,
-          tension: 0, // Sharp, mountain-like lines
+          tension: 0,
           pointRadius: 3,
         },
       ],
@@ -259,7 +274,6 @@ export default function Dashboard() {
 
   const performanceData = filterPerformanceData();
 
-  // Allocation Pie Chart Data (Dynamic)
   const stocksValue = portfolioSummary.find((item) => item.title === "Stocks")?.value.replace("$", "").replace(/,/g, "") || 0;
   const bondsValue = portfolioSummary.find((item) => item.title === "Bonds")?.value.replace("$", "").replace(/,/g, "") || 0;
   const insuranceValue = portfolioSummary.find((item) => item.title === "Insurance")?.value.replace("$", "").replace(/,/g, "") || 0;
@@ -281,7 +295,6 @@ export default function Dashboard() {
     ],
   };
 
-  // Chart options
   const performanceOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -321,7 +334,6 @@ export default function Dashboard() {
     },
   };
 
-  // Handle Add Funds button click
   const handleAddFunds = () => {
     alert("Redirecting to payment gateway to add funds...");
   };
@@ -332,7 +344,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      {/* Portfolio Summary */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         {portfolioSummary.map((item, index) => (
           <div
@@ -355,7 +366,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Tabs */}
       <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
         {["overview", "trade", "suggestions", "SIP", "Insurance"].map((tab) => (
           <button
@@ -370,7 +380,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div className="animate-fade-in space-y-8">
         {activeTab === "overview" && (
           <>
@@ -380,11 +389,6 @@ export default function Dashboard() {
                 <button className="btn btn-sm btn-outline btn-primary" onClick={handleAddFunds}>
                   Add Funds
                 </button>
-              <h3 className="text-lg font-semibold flex items-center">
-                  <FaCoins className="mr-2" />
-                  Account Balance
-                </h3>
-                <button className="btn btn-sm btn-outline">Add Funds</button>
               </div>
               <p className="text-xl font-bold">
                 ${profile.balance
@@ -398,13 +402,20 @@ export default function Dashboard() {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <div className="bg-white p-6 rounded-xl shadow-md col-span-2">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <FaChartLine className="text-indigo-500" /> Performance
-                </h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <FaChartLine className="text-indigo-500" /> Performance
+                  </h2>
+                  <button
+                    className="btn btn-sm btn-outline btn-warning"
+                    onClick={resetPerformanceHistory}
+                  >
+                    Reset Graph
+                  </button>
+                </div>
                 <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4">
                   <Line data={performanceData} options={performanceOptions} />
                 </div>
-                {/* Time Slot Selector */}
                 <div className="mt-4 flex justify-center gap-2">
                   {["1H", "1D", "1W", "1M", "All"].map((slot) => (
                     <button

@@ -78,7 +78,7 @@ export function InsuranceDetail() {
     labels: timestamps,
     datasets: [
       {
-        label: `${insurance?.name || "Insurance"} Premium (₹)`,
+        label: `${insurance?.id || "Insurance"} Premium (₹)`,
         data: mockPrices,
         borderColor: "#4f46e5",
         backgroundColor: "rgba(79, 70, 229, 0.1)",
@@ -143,13 +143,13 @@ export function InsuranceDetail() {
       );
 
       const successMsg = action === "purchase"
-        ? `Successfully purchased ${quantity} unit${quantity > 1 ? "s" : ""} of ${insurance.name} at ₹${insuranceInfo.price}`
-        : `Successfully canceled ${quantity} unit${quantity > 1 ? "s" : ""} of ${insurance.name} at ₹${insuranceInfo.price}. Refund: ₹${response.data.profit_loss || "N/A"}`;
+        ? `Successfully purchased ${quantity} unit${quantity > 1 ? "s" : ""} of ${insurance.id} at ₹${insuranceInfo.price}`
+        : `Successfully canceled ${quantity} unit${quantity > 1 ? "s" : ""} of ${insurance.id} at ₹${insuranceInfo.price}. Profit: ₹${response.data.profit_loss || "N/A"}`;
       setMessage(successMsg);
     } catch (error) {
       console.error(`${action} error:`, error);
       const errorMsg = error.response?.data?.error || error.message;
-      setMessage(`Failed to ${action} ${insurance.name}: ${errorMsg}`);
+      setMessage(`Failed to ${action} ${insurance.id}: ${errorMsg}`);
     } finally {
       setIsSubmitting(false);
       setQuantity(1);
@@ -179,7 +179,7 @@ export function InsuranceDetail() {
       <header className="max-w-6xl mx-auto mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{insurance.name}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{insurance.id}</h1>
             <p className="text-gray-500 text-sm md:text-base mt-1">Insurance Policy Details</p>
           </div>
           <Link
@@ -229,7 +229,7 @@ export function InsuranceDetail() {
             <dl className="space-y-3 text-gray-600">
               <div className="flex justify-between">
                 <dt className="font-medium text-gray-800">Name</dt>
-                <dd>{insurance.name}</dd>
+                <dd>{insurance.id}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="font-medium text-gray-800">Type</dt>
@@ -271,7 +271,7 @@ export function InsuranceDetail() {
 
           {/* Trade Section */}
           <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Manage {insurance.name}</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Manage {insurance.id}</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <label htmlFor="quantity" className="text-sm font-medium text-gray-700">Units</label>
@@ -313,7 +313,7 @@ export function InsuranceDetail() {
                     </svg>
                   ) : (
                     <>
-                      <FaWallet /> Cancel
+                      <FaWallet /> Sell
                     </>
                   )}
                 </button>

@@ -20,8 +20,6 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import myImage from "../assets/bse-fotor-ai-art-effects-20250316045844.jpeg.jpg";
-import stockData from "../stocks.json"; // Import the stock data
 
 // Register Chart.js components
 ChartJS.register(
@@ -291,7 +289,6 @@ export default function LandingPage() {
       return acc;
     }, {})
   );
-  const [tickerText, setTickerText] = useState(""); // State for the ticker text
   const navigate = useNavigate();
 
   // Load user session from localStorage
@@ -300,35 +297,6 @@ export default function LandingPage() {
     if (storedUser) {
       setUserId(storedUser);
     }
-  }, []);
-
-  // Process stock data for the ticker
-  useEffect(() => {
-    const latestPrices = stockData.stocks.map((stock) => {
-      const symbol = stock["Meta Data"]["2. Symbol"];
-      const timeSeries = stock["Time Series (5min)"];
-      const sortedTimes = Object.keys(timeSeries).sort().reverse(); // Sort times in descending order
-      const latestTime = sortedTimes[0]; // Latest time (e.g., 14:40:00)
-      const previousTime = sortedTimes[1]; // Previous time (e.g., 14:35:00)
-
-      const latestPrice = parseFloat(timeSeries[latestTime]["4. close"]).toFixed(2);
-      const previousPrice = previousTime ? parseFloat(timeSeries[previousTime]["4. close"]).toFixed(2) : latestPrice;
-      const priceChange = previousTime ? (parseFloat(latestPrice) - parseFloat(previousPrice)) : 0;
-
-      return {
-        symbol,
-        price: latestPrice,
-        change: priceChange, // Positive for increase, negative for decrease, 0 if no previous data
-      };
-    });
-
-    // Create the ticker text (repeated for seamless scrolling)
-    const tickerElements = latestPrices.map(({ symbol, price, change }) => {
-      const arrow = change > 0 ? "▲" : change < 0 ? "▼" : ""; // Add arrow based on price change
-      return `<span style="color: ${change > 0 ? "green" : change < 0 ? "red" : "white"}">${symbol} $${price} ${arrow}</span>`;
-    });
-    const tickerString = `${tickerElements.join(" &nbsp;&nbsp;&nbsp; ")} &nbsp;&nbsp;&nbsp; `;
-    setTickerText(tickerString.repeat(2)); // Repeat for smooth looping
   }, []);
 
   // Simulated login
@@ -427,52 +395,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-gray-50">
-      {/* Inline CSS for the ticker and image */}
-      <style>
-        {`
-          .image-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            margin-bottom: 20px;
-            position: relative;
-          }
-
-          .building-image {
-            width: 100%;
-            height: auto;
-            display: block;
-          }
-
-          .ticker-band {
-            position: absolute;
-            top: 50%; /* Align with the horizontal patch */
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 10px 0;
-            overflow: hidden;
-          }
-
-          .ticker {
-            display: inline-block;
-            white-space: nowrap;
-            color: white;
-            font-family: Arial, sans-serif;
-            font-size: 20px;
-            animation: scroll 15s linear infinite;
-          }
-
-          @keyframes scroll {
-            0% {
-              transform: translateX(100%);
-            }
-            100% {
-              transform: translateX(-100%);
-            }
-          }
-        `}
-      </style>
-
       {/* Navbar */}
       <nav className="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg px-4 py-3 sticky top-0 z-20 w-full">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -585,40 +507,29 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Stock Ticker and Image Section */}
-      <section className="hero-section">
-  {/* Sky Text */}
-  <div className="hero-text">
-    <h3 className="text-2xl md:text-4xl font-bold mb-4">
-      Take Control of Your Investments
-    </h3>
-    <p className="text-lg md:text-xl  mb-8 ">
-      Manage your portfolio, track performance, and explore opportunities with InvestmentHub
-    </p>
-    <div className="flex gap-4 justify-center">
-      <Link
-        to="/signup"
-        className="btn bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
-      >
-        Get Started <FaArrowRight />
-      </Link>
-      <Link
-        to="/dashboard"
-        className="btn bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300"
-      >
-        View Demo
-      </Link>
-    </div>
-  </div>
-  
-  {/* Ticker Band */}
-  <div className="ticker-band">
-    <div
-      className="ticker"
-      dangerouslySetInnerHTML={{ __html: tickerText }}
-    />
-  </div>
-</section>
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-indigo-50 to-gray-50">
+        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+          Take Control of Your Investments
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mb-8">
+          Manage your portfolio, track performance, and explore opportunities with InvestmentHub – your all-in-one financial dashboard.
+        </p>
+        <div className="flex gap-4">
+          <Link
+            to="/signup"
+            className="btn bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+          >
+            Get Started <FaArrowRight />
+          </Link>
+          <Link
+            to="/dashboard"
+            className="btn bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300"
+          >
+            View Demo
+          </Link>
+        </div>
+      </section>
 
       {/* Market Indices Section */}
       <section className="py-12 bg-white">

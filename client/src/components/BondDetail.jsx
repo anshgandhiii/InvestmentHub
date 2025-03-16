@@ -30,7 +30,7 @@ export function BondDetail() {
   console.log("bondId from URL:", bondId);
   console.log("Available bond symbols:", bonds.map(b => b["Meta Data"]["2. Symbol"]));
 
-  const bond = bonds.find((b) => b["Meta Data"]["2. Symbol"] === bondId); // Match by Symbol
+  const bond = bonds.find((b) => b["Meta Data"]["2. Symbol"].trim() === bondId.trim()); // Match by Symbol with trim
   console.log("Matched bond:", bond);
 
   const userId = localStorage.getItem("user_id");
@@ -58,7 +58,7 @@ export function BondDetail() {
         setCurrentPrices(newPrices);
         return nextIndex;
       });
-    }, 10000); // Update every 2 seconds
+    }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
   }, [bonds, bond]);
@@ -139,7 +139,7 @@ export function BondDetail() {
     },
   };
 
-  // Buy/Sell handler
+  // Buy/Sell handler with asset_type
   const handleBuySell = async (action) => {
     if (!userId) {
       setMessage("Please log in to perform this action.");
@@ -158,7 +158,7 @@ export function BondDetail() {
         {
           user_id: userId,
           asset_symbol: bondId,
-          asset_type: "bond",
+          asset_type: "bond", // Added to identify this as a bond transaction
           price: parseFloat(bondInfo.price),
           quantity: quantity,
           transaction_type: action,

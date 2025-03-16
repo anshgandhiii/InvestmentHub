@@ -47,7 +47,6 @@ class TransactionView(APIView):
         logger.info(f"POST request received with data: {request.data}")
         
         user_id = request.data.get('user_id')
-        asset_type = request.data.get("asset_type")
         if not user_id:
             logger.error("user_id is missing in request data")
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -55,12 +54,12 @@ class TransactionView(APIView):
         try:
             profile = UserProfile.objects.get(user__id=user_id)
             logger.info(f"Found UserProfile for user_id={user_id}")
+
             asset_symbol = request.data.get('asset_symbol')
-            # print("assetsymbol ",asset_symbol)
             price = request.data.get('price')
             quantity = request.data.get('quantity', 0)
             transaction_type = request.data.get('transaction_type')
-            # print("transaction_type ",transaction_type)
+
             logger.info(f"Parsed data: asset_symbol={asset_symbol}, price={price}, quantity={quantity}, transaction_type={transaction_type}")
 
             if not all([asset_symbol, price, quantity, transaction_type]):
@@ -95,30 +94,24 @@ class TransactionView(APIView):
 
             amount = price * quantity
             logger.info(f"Calculated amount: {amount}")
+
             if transaction_type == 'buy':
                 if profile.balance < amount:
                     logger.error(f"Insufficient balance: {profile.balance} < {amount}")
                     return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 profile.balance -= amount
                 profile.boughtsum += amount
-                if(asset_type == 'bond'):
-                    profile.bonds += amount
-                elif(asset_type == 'insurance'):
-                    profile.insurance += amount
-                else:
-                    profile.stocks += amount
+                profile.stocks += amount
                 logger.info(f"Buying {quantity} of {asset_symbol} at {price} for {amount}")
 
                 # Check if Portfolio exists, create or update accordingly
                 try:
-                    print("assetsymbol ",asset_symbol)
                     portfolio = Portfolio.objects.get(user_profile=profile, asset_symbol=asset_symbol)
                     logger.info(f"Found existing portfolio for {asset_symbol}, updating quantity")
                     portfolio.quantity = models.F('quantity') + quantity
                     portfolio.save()
                 except Portfolio.DoesNotExist:
                     logger.info(f"No portfolio found for {asset_symbol}, creating new entry")
-                    print("assetsymbol ",asset_symbol)
                     Portfolio.objects.create(
                         user_profile=profile,
                         asset_symbol=asset_symbol,
@@ -151,12 +144,7 @@ class TransactionView(APIView):
 
                     profile.balance += amount
                     profile.boughtsum -= amount
-                    if(asset_type == 'bond'):
-                        profile.bonds -= amount
-                    elif(asset_type == 'insurance'):
-                        profile.insurance -= amount
-                    else:
-                        profile.stocks -= amount
+                    profile.stocks -= amount
                     portfolio.quantity -= quantity
                     if portfolio.quantity == 0:
                         portfolio.delete()
