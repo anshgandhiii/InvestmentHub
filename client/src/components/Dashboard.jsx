@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaChartLine, FaDollarSign, FaArrowUp, FaArrowDown, FaChartBar, FaChartPie } from "react-icons/fa";
 import axios from "axios";
 import { TradePanel } from "./TradePanel";
-import {InvestmentSuggestions} from "./InvestmentSuggessions";
+import InvestmentSuggestions from "./InvestmentSuggessions";
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
 import stockData from "../stocks.json"; // Import stocks.json
@@ -85,8 +85,8 @@ export default function Dashboard() {
 
   const updatePortfolioSummary = (portfolio, profileData, priceIndex) => {
     const stockTimestamps =
-      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (5min)"]
-        ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse()
+      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (60min)"]
+        ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse()
         : [];
     const bondTimestamps =
       bonds.length > 0 && bonds[0] && bonds[0]["Time Series (5min)"]
@@ -98,7 +98,7 @@ export default function Dashboard() {
       if (stock && stock["Meta Data"]) {
         const symbol = stock["Meta Data"]["2. Symbol"];
         currentPrices[symbol] = stockTimestamps[priceIndex]
-          ? parseFloat(stock["Time Series (5min)"][stockTimestamps[priceIndex]]["4. close"])
+          ? parseFloat(stock["Time Series (60min)"][stockTimestamps[priceIndex]]["4. close"])
           : 0;
       }
     });
@@ -206,8 +206,8 @@ export default function Dashboard() {
     if (loading || !portfolioData.length) return;
 
     const timestamps =
-      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (5min)"]
-        ? Object.keys(stocks[0]["Time Series (5min)"]).sort().reverse()
+      stocks.length > 0 && stocks[0] && stocks[0]["Time Series (60min)"]
+        ? Object.keys(stocks[0]["Time Series (60min)"]).sort().reverse()
         : [];
     if (!timestamps.length) return;
 

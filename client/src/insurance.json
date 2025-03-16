@@ -1,502 +1,502 @@
 [
     {
-        "id": "Homefront Insurance 153",
+        "id": "TermGuardian 433",
+        "type": "insurance",
+        "category": "term",
+        "price": "2762.40",
+        "risk_level": "medium",
+        "term_years": 10,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "84391.3200"
+    },
+    {
+        "id": "BrickWall Protection 272",
         "type": "insurance",
         "category": "property",
-        "price": "2652.07",
+        "price": "1947.34",
+        "risk_level": "medium",
+        "term_years": 6,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "34740.5456"
+    },
+    {
+        "id": "SecureTerm Elite 135",
+        "type": "insurance",
+        "category": "term",
+        "price": "2958.99",
+        "risk_level": "medium",
+        "term_years": 9,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "92882.6961"
+    },
+    {
+        "id": "HealthSafe Plus 247",
+        "type": "insurance",
+        "category": "health",
+        "price": "2056.06",
+        "risk_level": "medium",
+        "term_years": 3,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "84298.4600"
+    },
+    {
+        "id": "TermLock Policy 717",
+        "type": "insurance",
+        "category": "term",
+        "price": "1296.66",
+        "risk_level": "high",
+        "term_years": 26,
+        "premium_frequency": "monthly",
+        "coverage_amount": "30834.5748"
+    },
+    {
+        "id": "LifeSecure Plus 797",
+        "type": "insurance",
+        "category": "life",
+        "price": "1836.35",
+        "risk_level": "high",
+        "term_years": 20,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "30336.5020"
+    },
+    {
+        "id": "BrickWall Protection 844",
+        "type": "insurance",
+        "category": "property",
+        "price": "2981.57",
+        "risk_level": "low",
+        "term_years": 11,
+        "premium_frequency": "annually",
+        "coverage_amount": "109542.8818"
+    },
+    {
+        "id": "TermLock Policy 811",
+        "type": "insurance",
+        "category": "term",
+        "price": "4543.85",
+        "risk_level": "high",
+        "term_years": 11,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "107689.2450"
+    },
+    {
+        "id": "ForeverSafe Plan 607",
+        "type": "insurance",
+        "category": "life",
+        "price": "3980.26",
+        "risk_level": "low",
+        "term_years": 16,
+        "premium_frequency": "annually",
+        "coverage_amount": "80162.4364"
+    },
+    {
+        "id": "DwellSecure Policy 190",
+        "type": "insurance",
+        "category": "property",
+        "price": "2470.41",
+        "risk_level": "medium",
+        "term_years": 17,
+        "premium_frequency": "annually",
+        "coverage_amount": "104523.0471"
+    },
+    {
+        "id": "HealthSafe Plus 349",
+        "type": "insurance",
+        "category": "health",
+        "price": "2750.89",
+        "risk_level": "high",
+        "term_years": 17,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "95235.8118"
+    },
+    {
+        "id": "SecureTerm Elite 509",
+        "type": "insurance",
+        "category": "term",
+        "price": "2282.76",
+        "risk_level": "high",
+        "term_years": 16,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "90694.0548"
+    },
+    {
+        "id": "PureLife Assurance 892",
+        "type": "insurance",
+        "category": "life",
+        "price": "4946.72",
+        "risk_level": "high",
+        "term_years": 15,
+        "premium_frequency": "annually",
+        "coverage_amount": "103831.6528"
+    },
+    {
+        "id": "LifeTerm Advantage 990",
+        "type": "insurance",
+        "category": "term",
+        "price": "3136.18",
+        "risk_level": "high",
+        "term_years": 1,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "60057.8470"
+    },
+    {
+        "id": "PureTerm Assurance 826",
+        "type": "insurance",
+        "category": "term",
+        "price": "4898.95",
+        "risk_level": "high",
+        "term_years": 17,
+        "premium_frequency": "annually",
+        "coverage_amount": "240538.4450"
+    },
+    {
+        "id": "LifeHorizon Coverage 984",
+        "type": "insurance",
+        "category": "life",
+        "price": "3840.83",
+        "risk_level": "low",
+        "term_years": 20,
+        "premium_frequency": "annually",
+        "coverage_amount": "96135.9749"
+    },
+    {
+        "id": "TermGuardian 699",
+        "type": "insurance",
+        "category": "term",
+        "price": "5406.35",
+        "risk_level": "high",
+        "term_years": 22,
+        "premium_frequency": "annually",
+        "coverage_amount": "109370.4605"
+    },
+    {
+        "id": "MediCare Essential 129",
+        "type": "insurance",
+        "category": "health",
+        "price": "2695.40",
+        "risk_level": "medium",
+        "term_years": 8,
+        "premium_frequency": "annually",
+        "coverage_amount": "111993.8700"
+    },
+    {
+        "id": "LifeSecure Plus 360",
+        "type": "insurance",
+        "category": "life",
+        "price": "4191.80",
         "risk_level": "low",
         "term_years": 14,
         "premium_frequency": "quarterly",
-        "coverage_amount": "62562.3313"
+        "coverage_amount": "156773.3200"
     },
     {
-        "id": "AssetShield 219",
-        "type": "insurance",
-        "category": "property",
-        "price": "2324.64",
-        "risk_level": "medium",
-        "term_years": 2,
-        "premium_frequency": "annually",
-        "coverage_amount": "55582.1424"
-    },
-    {
-        "id": "TermLock Policy 737",
-        "type": "insurance",
-        "category": "term",
-        "price": "5357.49",
-        "risk_level": "medium",
-        "term_years": 16,
-        "premium_frequency": "monthly",
-        "coverage_amount": "170743.2063"
-    },
-    {
-        "id": "LifeTerm Advantage 362",
-        "type": "insurance",
-        "category": "term",
-        "price": "5037.74",
-        "risk_level": "medium",
-        "term_years": 15,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "176421.6548"
-    },
-    {
-        "id": "MediGuardian 262",
-        "type": "insurance",
-        "category": "health",
-        "price": "3192.42",
-        "risk_level": "high",
-        "term_years": 12,
-        "premium_frequency": "annually",
-        "coverage_amount": "107233.3878"
-    },
-    {
-        "id": "HealthSafe Plus 403",
-        "type": "insurance",
-        "category": "health",
-        "price": "2386.86",
-        "risk_level": "low",
-        "term_years": 24,
-        "premium_frequency": "monthly",
-        "coverage_amount": "38619.3948"
-    },
-    {
-        "id": "EstateCare 640",
-        "type": "insurance",
-        "category": "property",
-        "price": "1764.54",
-        "risk_level": "low",
-        "term_years": 28,
-        "premium_frequency": "annually",
-        "coverage_amount": "84574.4022"
-    },
-    {
-        "id": "AssetShield 484",
-        "type": "insurance",
-        "category": "property",
-        "price": "2368.89",
-        "risk_level": "medium",
-        "term_years": 1,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "86085.4626"
-    },
-    {
-        "id": "SafeHaven Coverage 141",
-        "type": "insurance",
-        "category": "property",
-        "price": "1519.81",
-        "risk_level": "low",
-        "term_years": 3,
-        "premium_frequency": "annually",
-        "coverage_amount": "68862.5911"
-    },
-    {
-        "id": "LifeQuest Insurance 893",
+        "id": "LifeHorizon Coverage 612",
         "type": "insurance",
         "category": "life",
-        "price": "4692.00",
+        "price": "3163.29",
         "risk_level": "medium",
-        "term_years": 6,
+        "term_years": 8,
+        "premium_frequency": "monthly",
+        "coverage_amount": "156076.7286"
+    },
+    {
+        "id": "TermGuardian 422",
+        "type": "insurance",
+        "category": "term",
+        "price": "5915.33",
+        "risk_level": "medium",
+        "term_years": 14,
         "premium_frequency": "annually",
-        "coverage_amount": "141933.0000"
+        "coverage_amount": "188876.4869"
     },
     {
-        "id": "HomeSafe Insurance 834",
+        "id": "EternaLife Protection 971",
         "type": "insurance",
-        "category": "property",
-        "price": "1586.01",
-        "risk_level": "low",
-        "term_years": 17,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "43535.9745"
-    },
-    {
-        "id": "SafeHaven Coverage 896",
-        "type": "insurance",
-        "category": "property",
-        "price": "1077.71",
-        "risk_level": "low",
-        "term_years": 13,
-        "premium_frequency": "annually",
-        "coverage_amount": "46115.2109"
-    },
-    {
-        "id": "DwellSecure Policy 783",
-        "type": "insurance",
-        "category": "property",
-        "price": "1103.69",
+        "category": "life",
+        "price": "2844.70",
         "risk_level": "medium",
         "term_years": 1,
         "premium_frequency": "quarterly",
-        "coverage_amount": "44765.6664"
+        "coverage_amount": "64005.7500"
     },
     {
-        "id": "PropertyGuard Plan 750",
+        "id": "MediGuardian 840",
         "type": "insurance",
-        "category": "property",
-        "price": "2898.73",
+        "category": "health",
+        "price": "2708.39",
+        "risk_level": "high",
+        "term_years": 29,
+        "premium_frequency": "annually",
+        "coverage_amount": "62590.8929"
+    },
+    {
+        "id": "SecureTerm Elite 273",
+        "type": "insurance",
+        "category": "term",
+        "price": "1093.58",
         "risk_level": "medium",
         "term_years": 30,
         "premium_frequency": "quarterly",
-        "coverage_amount": "88817.0872"
+        "coverage_amount": "47395.7572"
     },
     {
-        "id": "WellnessPro Plan 395",
-        "type": "insurance",
-        "category": "health",
-        "price": "3952.70",
-        "risk_level": "low",
-        "term_years": 11,
-        "premium_frequency": "annually",
-        "coverage_amount": "98659.3920"
-    },
-    {
-        "id": "HealthSafe Plus 658",
-        "type": "insurance",
-        "category": "health",
-        "price": "2278.86",
-        "risk_level": "high",
-        "term_years": 16,
-        "premium_frequency": "annually",
-        "coverage_amount": "60754.4076"
-    },
-    {
-        "id": "PropertyGuard Plan 326",
-        "type": "insurance",
-        "category": "property",
-        "price": "2066.92",
-        "risk_level": "medium",
-        "term_years": 13,
-        "premium_frequency": "annually",
-        "coverage_amount": "75111.8728"
-    },
-    {
-        "id": "FitLife Coverage 632",
-        "type": "insurance",
-        "category": "health",
-        "price": "3977.08",
-        "risk_level": "medium",
-        "term_years": 1,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "78785.9548"
-    },
-    {
-        "id": "ForeverSafe Plan 164",
-        "type": "insurance",
-        "category": "life",
-        "price": "3755.26",
-        "risk_level": "medium",
-        "term_years": 11,
-        "premium_frequency": "annually",
-        "coverage_amount": "122834.5546"
-    },
-    {
-        "id": "Homefront Insurance 794",
-        "type": "insurance",
-        "category": "property",
-        "price": "2133.87",
-        "risk_level": "low",
-        "term_years": 24,
-        "premium_frequency": "annually",
-        "coverage_amount": "43338.8997"
-    },
-    {
-        "id": "ForeverSafe Plan 479",
-        "type": "insurance",
-        "category": "life",
-        "price": "3062.86",
-        "risk_level": "high",
-        "term_years": 29,
-        "premium_frequency": "monthly",
-        "coverage_amount": "87689.6818"
-    },
-    {
-        "id": "HealthPrime Shield 145",
-        "type": "insurance",
-        "category": "health",
-        "price": "3891.56",
-        "risk_level": "medium",
-        "term_years": 28,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "96121.5320"
-    },
-    {
-        "id": "EstateCare 357",
-        "type": "insurance",
-        "category": "property",
-        "price": "1001.92",
-        "risk_level": "medium",
-        "term_years": 28,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "19647.6512"
-    },
-    {
-        "id": "ForeverSafe Plan 691",
-        "type": "insurance",
-        "category": "life",
-        "price": "2934.00",
-        "risk_level": "low",
-        "term_years": 24,
-        "premium_frequency": "annually",
-        "coverage_amount": "117741.4200"
-    },
-    {
-        "id": "TermGuardian 751",
+        "id": "TermGuardian 332",
         "type": "insurance",
         "category": "term",
-        "price": "3587.43",
-        "risk_level": "high",
-        "term_years": 15,
-        "premium_frequency": "monthly",
-        "coverage_amount": "78564.7170"
-    },
-    {
-        "id": "LifeSecure Plus 602",
-        "type": "insurance",
-        "category": "life",
-        "price": "2449.61",
-        "risk_level": "medium",
-        "term_years": 4,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "83409.2205"
-    },
-    {
-        "id": "HealthPrime Shield 177",
-        "type": "insurance",
-        "category": "health",
-        "price": "493.12",
-        "risk_level": "medium",
-        "term_years": 15,
-        "premium_frequency": "monthly",
-        "coverage_amount": "22624.3456"
-    },
-    {
-        "id": "CoreHealth Insurance 791",
-        "type": "insurance",
-        "category": "health",
-        "price": "2825.29",
-        "risk_level": "high",
-        "term_years": 24,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "39921.3477"
-    },
-    {
-        "id": "VitalGuard Policy 507",
-        "type": "insurance",
-        "category": "life",
-        "price": "3997.62",
-        "risk_level": "high",
-        "term_years": 5,
-        "premium_frequency": "annually",
-        "coverage_amount": "122447.1006"
-    },
-    {
-        "id": "LifeSecure Plus 114",
-        "type": "insurance",
-        "category": "life",
-        "price": "1519.43",
-        "risk_level": "high",
-        "term_years": 5,
-        "premium_frequency": "monthly",
-        "coverage_amount": "70851.0209"
-    },
-    {
-        "id": "PureLife Assurance 889",
-        "type": "insurance",
-        "category": "life",
-        "price": "3464.61",
-        "risk_level": "medium",
-        "term_years": 15,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "163633.5303"
-    },
-    {
-        "id": "LifeTerm Advantage 996",
-        "type": "insurance",
-        "category": "term",
-        "price": "3095.67",
-        "risk_level": "high",
-        "term_years": 27,
-        "premium_frequency": "annually",
-        "coverage_amount": "118780.8579"
-    },
-    {
-        "id": "PropertyGuard Plan 456",
-        "type": "insurance",
-        "category": "property",
-        "price": "952.96",
-        "risk_level": "medium",
-        "term_years": 5,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "33429.8368"
-    },
-    {
-        "id": "Homefront Insurance 117",
-        "type": "insurance",
-        "category": "property",
-        "price": "2922.99",
-        "risk_level": "low",
-        "term_years": 16,
-        "premium_frequency": "monthly",
-        "coverage_amount": "71379.4158"
-    },
-    {
-        "id": "FitLife Coverage 806",
-        "type": "insurance",
-        "category": "health",
-        "price": "3373.31",
-        "risk_level": "medium",
-        "term_years": 27,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "37443.7410"
-    },
-    {
-        "id": "WellnessPro Plan 193",
-        "type": "insurance",
-        "category": "health",
-        "price": "3793.87",
-        "risk_level": "medium",
-        "term_years": 22,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "101220.4516"
-    },
-    {
-        "id": "SecureTerm Elite 123",
-        "type": "insurance",
-        "category": "term",
-        "price": "4994.55",
-        "risk_level": "high",
-        "term_years": 5,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "100290.5640"
-    },
-    {
-        "id": "WellnessPro Plan 688",
-        "type": "insurance",
-        "category": "health",
-        "price": "658.78",
-        "risk_level": "high",
-        "term_years": 20,
-        "premium_frequency": "annually",
-        "coverage_amount": "15580.1470"
-    },
-    {
-        "id": "TermGuardian 451",
-        "type": "insurance",
-        "category": "term",
-        "price": "1029.16",
-        "risk_level": "medium",
-        "term_years": 10,
-        "premium_frequency": "annually",
-        "coverage_amount": "26439.1204"
-    },
-    {
-        "id": "DwellSecure Policy 808",
-        "type": "insurance",
-        "category": "property",
-        "price": "2842.93",
-        "risk_level": "low",
-        "term_years": 12,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "62942.4702"
-    },
-    {
-        "id": "PureTerm Assurance 827",
-        "type": "insurance",
-        "category": "term",
-        "price": "4572.01",
-        "risk_level": "high",
-        "term_years": 29,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "129753.6438"
-    },
-    {
-        "id": "TermGuardian 519",
-        "type": "insurance",
-        "category": "term",
-        "price": "5825.71",
-        "risk_level": "high",
-        "term_years": 3,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "261516.1219"
-    },
-    {
-        "id": "TermGuardian 706",
-        "type": "insurance",
-        "category": "term",
-        "price": "2031.27",
-        "risk_level": "medium",
-        "term_years": 28,
-        "premium_frequency": "monthly",
-        "coverage_amount": "59820.9015"
-    },
-    {
-        "id": "BrickWall Protection 215",
-        "type": "insurance",
-        "category": "property",
-        "price": "2023.89",
-        "risk_level": "medium",
-        "term_years": 23,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "55555.7805"
-    },
-    {
-        "id": "PureTerm Assurance 371",
-        "type": "insurance",
-        "category": "term",
-        "price": "3272.82",
-        "risk_level": "medium",
-        "term_years": 20,
-        "premium_frequency": "annually",
-        "coverage_amount": "113763.2232"
-    },
-    {
-        "id": "HealthPrime Shield 108",
-        "type": "insurance",
-        "category": "health",
-        "price": "1398.14",
-        "risk_level": "low",
-        "term_years": 11,
-        "premium_frequency": "annually",
-        "coverage_amount": "64286.4772"
-    },
-    {
-        "id": "TermLock Policy 930",
-        "type": "insurance",
-        "category": "term",
-        "price": "1110.06",
+        "price": "3321.10",
         "risk_level": "medium",
         "term_years": 18,
         "premium_frequency": "monthly",
-        "coverage_amount": "20735.9208"
+        "coverage_amount": "59480.9010"
     },
     {
-        "id": "Homefront Insurance 307",
+        "id": "LifeSecure Plus 261",
         "type": "insurance",
-        "category": "property",
-        "price": "1177.74",
-        "risk_level": "low",
-        "term_years": 26,
-        "premium_frequency": "monthly",
-        "coverage_amount": "47392.2576"
+        "category": "life",
+        "price": "4427.49",
+        "risk_level": "high",
+        "term_years": 13,
+        "premium_frequency": "annually",
+        "coverage_amount": "97050.5808"
     },
     {
-        "id": "LifeTerm Advantage 614",
+        "id": "VitalityCare 107",
+        "type": "insurance",
+        "category": "health",
+        "price": "1745.25",
+        "risk_level": "medium",
+        "term_years": 4,
+        "premium_frequency": "monthly",
+        "coverage_amount": "36004.5075"
+    },
+    {
+        "id": "TermGuardian 908",
         "type": "insurance",
         "category": "term",
-        "price": "1659.62",
-        "risk_level": "high",
-        "term_years": 10,
-        "premium_frequency": "quarterly",
-        "coverage_amount": "38735.5308"
+        "price": "4176.29",
+        "risk_level": "medium",
+        "term_years": 24,
+        "premium_frequency": "monthly",
+        "coverage_amount": "133056.5994"
     },
     {
-        "id": "HomeSafe Insurance 761",
+        "id": "LegacyShield 159",
+        "type": "insurance",
+        "category": "life",
+        "price": "4392.33",
+        "risk_level": "low",
+        "term_years": 29,
+        "premium_frequency": "monthly",
+        "coverage_amount": "205780.6605"
+    },
+    {
+        "id": "PureLife Assurance 710",
+        "type": "insurance",
+        "category": "life",
+        "price": "4171.76",
+        "risk_level": "high",
+        "term_years": 28,
+        "premium_frequency": "annually",
+        "coverage_amount": "45555.6192"
+    },
+    {
+        "id": "TermSure Protection 935",
+        "type": "insurance",
+        "category": "term",
+        "price": "4005.96",
+        "risk_level": "high",
+        "term_years": 10,
+        "premium_frequency": "monthly",
+        "coverage_amount": "148140.4008"
+    },
+    {
+        "id": "TermVista 192",
+        "type": "insurance",
+        "category": "term",
+        "price": "3363.03",
+        "risk_level": "high",
+        "term_years": 9,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "36926.0694"
+    },
+    {
+        "id": "Homefront Insurance 111",
         "type": "insurance",
         "category": "property",
-        "price": "2693.31",
+        "price": "2923.82",
+        "risk_level": "low",
+        "term_years": 23,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "120607.5750"
+    },
+    {
+        "id": "HealthPrime Shield 192",
+        "type": "insurance",
+        "category": "health",
+        "price": "333.41",
+        "risk_level": "low",
+        "term_years": 20,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "3997.5859"
+    },
+    {
+        "id": "HomeSafe Insurance 419",
+        "type": "insurance",
+        "category": "property",
+        "price": "2347.55",
+        "risk_level": "low",
+        "term_years": 6,
+        "premium_frequency": "annually",
+        "coverage_amount": "114443.0625"
+    },
+    {
+        "id": "VitalGuard Policy 421",
+        "type": "insurance",
+        "category": "life",
+        "price": "2752.52",
+        "risk_level": "low",
+        "term_years": 6,
+        "premium_frequency": "annually",
+        "coverage_amount": "88906.3960"
+    },
+    {
+        "id": "HealthPrime Shield 237",
+        "type": "insurance",
+        "category": "health",
+        "price": "2222.27",
+        "risk_level": "low",
+        "term_years": 27,
+        "premium_frequency": "monthly",
+        "coverage_amount": "30800.6622"
+    },
+    {
+        "id": "SafeHaven Coverage 521",
+        "type": "insurance",
+        "category": "property",
+        "price": "1297.64",
+        "risk_level": "medium",
+        "term_years": 9,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "24499.4432"
+    },
+    {
+        "id": "VitalityCare 488",
+        "type": "insurance",
+        "category": "health",
+        "price": "1679.80",
+        "risk_level": "low",
+        "term_years": 10,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "64571.5120"
+    },
+    {
+        "id": "HealthPrime Shield 552",
+        "type": "insurance",
+        "category": "health",
+        "price": "2278.53",
+        "risk_level": "low",
+        "term_years": 19,
+        "premium_frequency": "annually",
+        "coverage_amount": "28048.7043"
+    },
+    {
+        "id": "FlexiTerm Plan 996",
+        "type": "insurance",
+        "category": "term",
+        "price": "2087.30",
+        "risk_level": "medium",
+        "term_years": 23,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "59154.0820"
+    },
+    {
+        "id": "ForeverSafe Plan 509",
+        "type": "insurance",
+        "category": "life",
+        "price": "2257.46",
+        "risk_level": "medium",
+        "term_years": 15,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "71877.5264"
+    },
+    {
+        "id": "VitalGuard Policy 918",
+        "type": "insurance",
+        "category": "life",
+        "price": "637.74",
+        "risk_level": "low",
+        "term_years": 13,
+        "premium_frequency": "annually",
+        "coverage_amount": "28105.2018"
+    },
+    {
+        "id": "ForeverSafe Plan 770",
+        "type": "insurance",
+        "category": "life",
+        "price": "3013.48",
+        "risk_level": "medium",
+        "term_years": 24,
+        "premium_frequency": "monthly",
+        "coverage_amount": "77145.0880"
+    },
+    {
+        "id": "LifeTerm Advantage 485",
+        "type": "insurance",
+        "category": "term",
+        "price": "3537.12",
+        "risk_level": "medium",
+        "term_years": 16,
+        "premium_frequency": "monthly",
+        "coverage_amount": "83440.6608"
+    },
+    {
+        "id": "PureTerm Assurance 713",
+        "type": "insurance",
+        "category": "term",
+        "price": "4652.56",
+        "risk_level": "high",
+        "term_years": 10,
+        "premium_frequency": "monthly",
+        "coverage_amount": "132225.7552"
+    },
+    {
+        "id": "TermGuardian 949",
+        "type": "insurance",
+        "category": "term",
+        "price": "3484.25",
+        "risk_level": "medium",
+        "term_years": 8,
+        "premium_frequency": "monthly",
+        "coverage_amount": "78465.3100"
+    },
+    {
+        "id": "PureTerm Assurance 480",
+        "type": "insurance",
+        "category": "term",
+        "price": "5804.63",
+        "risk_level": "high",
+        "term_years": 3,
+        "premium_frequency": "quarterly",
+        "coverage_amount": "161368.7140"
+    },
+    {
+        "id": "AssetShield 562",
+        "type": "insurance",
+        "category": "property",
+        "price": "2352.71",
+        "risk_level": "low",
+        "term_years": 27,
+        "premium_frequency": "annually",
+        "coverage_amount": "24656.4008"
+    },
+    {
+        "id": "VitalityCare 829",
+        "type": "insurance",
+        "category": "health",
+        "price": "3354.44",
         "risk_level": "low",
         "term_years": 9,
-        "premium_frequency": "annually",
-        "coverage_amount": "130383.1371"
+        "premium_frequency": "monthly",
+        "coverage_amount": "41662.1448"
     }
 ]

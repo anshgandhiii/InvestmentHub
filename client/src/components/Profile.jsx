@@ -1,31 +1,84 @@
-import { useState } from "react";
-import { FaUser, FaCreditCard, FaKey, FaSignOutAlt, FaEnvelope, FaPhone, FaLock, FaPalette } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaUser, FaCreditCard, FaKey, FaSignOutAlt, FaEnvelope, FaPalette, FaHistory } from "react-icons/fa";
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("personal");
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-  });
+  const [profile, setProfile] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [transactions, setTransactions] = useState([]);
 
+  // Fetch profile and transactions on component mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/user/profile/1/");
+        if (!response.ok) throw new Error("Failed to fetch profile");
+        const data = await response.json();
+        setProfile(data);
+        setFormData({
+          email: data.email,
+          risk_tolerance: data.risk_tolerance,
+        });
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    const fetchTransactions = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/investment/transactions/1/");
+        if (!response.ok) throw new Error("Failed to fetch transactions");
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchProfile();
+    fetchTransactions();
+  }, []);
+
+  // Handle input changes in the form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    alert("Changes saved successfully!");
+  // Save updated profile data via PUT request
+  const handleSave = async () => {
+    try {
+      const updatedProfile = { ...profile, ...formData };
+      const response = await fetch("http://127.0.0.1:8000/user/profile/1/", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProfile),
+      });
+      if (!response.ok) throw new Error("Failed to update profile");
+      const data = await response.json();
+      setProfile(data);
+      setIsEditing(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile");
+    }
   };
 
+  // Handle sign out confirmation
   const handleSignOut = () => {
     if (window.confirm("Are you sure you want to sign out?")) {
       alert("Signed out!");
     }
   };
+
+  // Show loading state if profile data is not yet fetched
+  if (!profile) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-gray-100">
@@ -37,8 +90,12 @@ export default function Profile() {
             InvestPro
           </a>
           <nav className="ml-auto flex gap-4">
-            <a href="/dashboard" className="btn btn-ghost btn-sm text-white hover:text-indigo-200">Dashboard</a>
-            <a href="/profile" className="btn btn-ghost btn-sm text-white underline">Profile</a>
+            <a href="/dashboard" className="btn btn-ghost btn-sm text-white hover:text-indigo-200">
+              Dashboard
+            </a>
+            <a href="/profile" className="btn btn-ghost btn-sm text-white underline">
+              Profile
+            </a>
           </nav>
         </div>
       </header>
@@ -55,14 +112,22 @@ export default function Profile() {
                     <img src="https://via.placeholder.com/96" alt="Profile" />
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">John Doe</h2>
-                <p className="text-sm text-indigo-600 font-semibold">Premium Investor</p>
-                <div className="space-y-3 w-full">
-                  <p className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                    <FaUser className="text-indigo-500" /> Since March 2023
+                <h2 className="text-2xl font-bold text-gray-800">{profile.user.username}</h2>
+                <div className="space-y-2 w-full text-sm text-gray-600">
+                  <p>
+                    <strong>Balance:</strong> ${profile.balance}
                   </p>
-                  <p className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                    <FaCreditCard className="text-indigo-500" /> Premium Plan
+                  <p>
+                    <strong>Bought Sum:</strong> ${profile.boughtsum}
+                  </p>
+                  <p>
+                    <strong>Stocks:</strong> ${profile.stocks}
+                  </p>
+                  <p>
+                    <strong>Bonds:</strong> ${profile.bonds}
+                  </p>
+                  <p>
+                    <strong>Insurance:</strong> ${profile.insurance}
                   </p>
                 </div>
                 <button
@@ -77,8 +142,8 @@ export default function Profile() {
             {/* Tabs and Content */}
             <div className="w-full md:w-2/3 space-y-6">
               {/* Tabs */}
-              <div className="tabs bg-white rounded-xl shadow-md p-3 flex gap-3">
-                {["personal", "security", "preferences"].map((tab) => (
+              <div className="tabs bg-white rounded-xl shadow-md p-3 flex gap-3 flex-wrap">
+                {["personal", "transactions", "security", "preferences"].map((tab) => (
                   <button
                     key={tab}
                     className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -87,6 +152,7 @@ export default function Profile() {
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab === "personal" && <FaUser className="inline mr-2" />}
+                    {tab === "transactions" && <FaHistory className="inline mr-2" />}
                     {tab === "security" && <FaKey className="inline mr-2" />}
                     {tab === "preferences" && <FaPalette className="inline mr-2" />}
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -106,36 +172,14 @@ export default function Profile() {
                         className="btn btn-sm btn-outline flex items-center gap-2"
                         onClick={() => setIsEditing(!isEditing)}
                       >
-                        {isEditing ? "Cancel" : <><FaKey className="h-4 w-4" /> Edit</>}
+                        {isEditing ? "Cancel" : (
+                          <>
+                            <FaKey className="h-4 w-4" /> Edit
+                          </>
+                        )}
                       </button>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-                      <div>
-                        <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaUser className="text-indigo-500" /> First Name
-                        </label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          className="input input-bordered w-full bg-gray-50"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div>
-                        <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaUser className="text-indigo-500" /> Last Name
-                        </label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          className="input input-bordered w-full bg-gray-50"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                        />
-                      </div>
                       <div>
                         <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
                           <FaEnvelope className="text-indigo-500" /> Email
@@ -144,23 +188,26 @@ export default function Profile() {
                           type="email"
                           name="email"
                           className="input input-bordered w-full bg-gray-50"
-                          value={formData.email}
+                          value={formData.email || ""}
                           onChange={handleInputChange}
                           disabled={!isEditing}
                         />
                       </div>
                       <div>
                         <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaPhone className="text-indigo-500" /> Phone
+                          <FaUser className="text-indigo-500" /> Risk Tolerance
                         </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          className="input input-bordered w-full bg-gray-50"
-                          value={formData.phone}
+                        <select
+                          name="risk_tolerance"
+                          className="select select-bordered w-full bg-gray-50"
+                          value={formData.risk_tolerance || ""}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                        />
+                        >
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                        </select>
                       </div>
                     </div>
                     {isEditing && (
@@ -168,6 +215,48 @@ export default function Profile() {
                         Save Changes
                       </button>
                     )}
+                  </>
+                )}
+
+                {activeTab === "transactions" && (
+                  <>
+                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                      <FaHistory className="text-indigo-500" /> Transaction History
+                    </h2>
+                    <div className="mt-6 overflow-x-auto">
+                      <table className="table w-full">
+                        <thead>
+                          <tr>
+                            <th>Asset</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {transactions.length > 0 ? (
+                            transactions.map((txn) => (
+                              <tr key={txn.id}>
+                                <td>{txn.asset_symbol}</td>
+                                <td>{txn.transaction_type}</td>
+                                <td>{txn.quantity}</td>
+                                <td>${txn.price}</td>
+                                <td>${txn.amount}</td>
+                                <td>{new Date(txn.created_at).toLocaleString()}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="6" className="text-center">
+                                No transactions found.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </>
                 )}
 
@@ -179,19 +268,19 @@ export default function Profile() {
                     <div className="space-y-6 mt-6">
                       <div>
                         <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaLock className="text-indigo-500" /> Current Password
+                          <FaCreditCard className="text-indigo-500" /> Current Password
                         </label>
                         <input type="password" className="input input-bordered w-full bg-gray-50" />
                       </div>
                       <div>
                         <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaLock className="text-indigo-500" /> New Password
+                          <FaCreditCard className="text-indigo-500" /> New Password
                         </label>
                         <input type="password" className="input input-bordered w-full bg-gray-50" />
                       </div>
                       <div>
                         <label className="label text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <FaLock className="text-indigo-500" /> Confirm New Password
+                          <FaCreditCard className="text-indigo-500" /> Confirm New Password
                         </label>
                         <input type="password" className="input input-bordered w-full bg-gray-50" />
                       </div>
