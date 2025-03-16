@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Portfolio(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    asset_symbol = models.CharField(max_length=10)  # e.g., "IBM"
+    asset_symbol = models.CharField(max_length=100)  # e.g., "IBM"
     quantity = models.IntegerField(default=0)
 
     def __str__(self):
@@ -12,7 +12,7 @@ class Portfolio(models.Model):
 
 class Transaction(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    asset_symbol = models.CharField(max_length=10)  # e.g., "IBM"
+    asset_symbol = models.CharField(max_length=100)  # e.g., "IBM"
     quantity = models.IntegerField()
     transaction_type = models.CharField(max_length=4, choices=[('buy', 'Buy'), ('sell', 'Sell')])
     price = models.DecimalField(max_digits=15, decimal_places=2)  # Price at transaction time

@@ -36,7 +36,7 @@ export function TradePanel() {
     });
     // Set initial prices for insurances
     insurances.forEach((insurance) => {
-      initialPrices[insurance.name] = insurance.price;
+      initialPrices[insurance.id] = insurance.price;
     });
     setCurrentPrices(initialPrices);
 
@@ -61,7 +61,7 @@ export function TradePanel() {
 
         // Insurances remain static
         insurances.forEach((insurance) => {
-          newPrices[insurance.name] = insurance.price;
+          newPrices[insurance.id] = insurance.price;
         });
 
         setCurrentPrices(newPrices);
@@ -117,7 +117,7 @@ export function TradePanel() {
   };
 
   const getInsuranceInfo = (insurance) => {
-    const symbol = insurance.name;
+    const symbol = insurance.id;
     if (!symbol || !currentPrices[symbol]) {
       return {
         price: "N/A",
@@ -144,7 +144,7 @@ export function TradePanel() {
     bond["Meta Data"]["2. Symbol"].toLowerCase().includes(searchQuery.toLowerCase())
   );
   const filteredInsurances = insurances.filter((insurance) => {
-    const matchesSearch = insurance.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = insurance.id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !filterCategory || insurance.category.toLowerCase() === filterCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
@@ -372,13 +372,13 @@ export function TradePanel() {
                     const { price, riskLevel, term, premium, coverage } = getInsuranceInfo(insurance);
                     return (
                       <tr
-                        key={insurance.name}
+                        key={insurance.id}
                         className={`${
                           index % 2 === 0 ? "bg-white" : "bg-gray-50"
                         } hover:bg-indigo-100 cursor-pointer transition-all duration-200`}
-                        onClick={() => handleInsuranceClick(insurance.name)}
+                        onClick={() => handleInsuranceClick(insurance.id)}
                       >
-                        <td className="py-4 px-6 font-medium text-gray-800">{insurance.name}</td>
+                        <td className="py-4 px-6 font-medium text-gray-800">{insurance.id}</td>
                         <td className="py-4 px-6 font-semibold text-gray-900">₹{price}</td>
                         <td className="py-4 px-6 text-gray-700">{riskLevel}</td>
                         <td className="py-4 px-6 text-gray-700">{term}</td>
