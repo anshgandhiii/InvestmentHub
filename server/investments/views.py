@@ -47,6 +47,7 @@ class TransactionView(APIView):
         logger.info(f"POST request received with data: {request.data}")
         
         user_id = request.data.get('user_id')
+        asset_type = request.data.get('asset_type')
         if not user_id:
             logger.error("user_id is missing in request data")
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -101,7 +102,12 @@ class TransactionView(APIView):
                     return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 profile.balance -= amount
                 profile.boughtsum += amount
-                profile.stocks += amount
+                if asset_type == 'stock':
+                    profile.stocks += amount
+                elif asset_type == 'bond':
+                    profile.bonds += amount
+                else:
+                    profile.insurance += amount
                 logger.info(f"Buying {quantity} of {asset_symbol} at {price} for {amount}")
 
                 # Check if Portfolio exists, create or update accordingly
@@ -144,7 +150,13 @@ class TransactionView(APIView):
 
                     profile.balance += amount
                     profile.boughtsum -= amount
-                    profile.stocks -= amount
+                    if asset_type == 'stock':
+                        profile.stocks -= amount
+                    elif asset_type == 'bond':
+                        profile.bonds -= amount
+                    else:
+                        profile.insurance -= amount
+                        
                     portfolio.quantity -= quantity
                     if portfolio.quantity == 0:
                         portfolio.delete()
