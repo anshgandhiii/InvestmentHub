@@ -23,10 +23,10 @@
     useEffect(() => {
       if (!stock) return;
 
-      const timestamps = Object.keys(stock["Time Series (5min)"]).sort().reverse();
+      const timestamps = Object.keys(stock["Time Series (60min)"]).sort().reverse();
       const initialPrices = {};
       stocks.forEach((s) => {
-        initialPrices[s["Meta Data"]["2. Symbol"]] = s["Time Series (5min)"][timestamps[0]]["4. close"];
+        initialPrices[s["Meta Data"]["2. Symbol"]] = s["Time Series (60min)"][timestamps[0]]["4. close"];
       });
       setCurrentPrices(initialPrices);
 
@@ -35,7 +35,7 @@
           const nextIndex = (prevIndex + 1) % timestamps.length;
           const newPrices = {};
           stocks.forEach((s) => {
-            newPrices[s["Meta Data"]["2. Symbol"]] = s["Time Series (5min)"][timestamps[nextIndex]]["4. close"];
+            newPrices[s["Meta Data"]["2. Symbol"]] = s["Time Series (60min)"][timestamps[nextIndex]]["4. close"];
           });
           setCurrentPrices(newPrices);
           return nextIndex;
@@ -47,14 +47,14 @@
 
     const getStockInfo = () => {
       if (!currentPrices[symbol]) return { price: "N/A", trend: null, change: "0.00", volume: "N/A", high: "N/A", low: "N/A", open: "N/A" };
-      const timestamps = Object.keys(stock["Time Series (5min)"]).sort().reverse();
+      const timestamps = Object.keys(stock["Time Series (60min)"]).sort().reverse();
       const currentPrice = parseFloat(currentPrices[symbol]);
       const prevPrice = parseFloat(
-        stock["Time Series (5min)"][timestamps[currentTimestampIndex - 1] || timestamps[0]]["4. close"]
+        stock["Time Series (60min)"][timestamps[currentTimestampIndex - 1] || timestamps[0]]["4. close"]
       );
       const trend = currentPrice > prevPrice ? "up" : currentPrice < prevPrice ? "down" : "neutral";
       const change = (currentPrice - prevPrice).toFixed(2);
-      const currentData = stock["Time Series (5min)"][timestamps[currentTimestampIndex]];
+      const currentData = stock["Time Series (60min)"][timestamps[currentTimestampIndex]];
       return {
         price: currentPrice.toFixed(2),
         trend,
@@ -69,12 +69,12 @@
     const stockInfo = getStockInfo();
 
     // Chart Data
-    const timestamps = stock ? Object.keys(stock["Time Series (5min)"]).sort().reverse() : [];
+    const timestamps = stock ? Object.keys(stock["Time Series (60min)"]).sort().reverse() : [];
     const chartData = {
       labels: timestamps.slice(0, 20).map((ts) => new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
       datasets: [{
         label: `${symbol} Price (₹)`,
-        data: timestamps.slice(0, 20).map((ts) => parseFloat(stock["Time Series (5min)"][ts]["4. close"])),
+        data: timestamps.slice(0, 20).map((ts) => parseFloat(stock["Time Series (60min)"][ts]["4. close"])),
         borderColor: "#4f46e5",
         backgroundColor: "rgba(79, 70, 229, 0.1)",
         fill: true,

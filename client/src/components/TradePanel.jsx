@@ -1,236 +1,27 @@
+"use client"
+
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { FaSearch, FaArrowUp, FaArrowDown, FaInfoCircle, FaTrash, FaChartLine } from "react-icons/fa"
-import { Line } from "recharts"
+import { FaSearch, FaArrowUp, FaArrowDown, FaInfoCircle, FaTrash, FaCode } from "react-icons/fa"
+import { Line } from "react-chartjs-2"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js"
+
+// Register ChartJS components
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 // Simulated data for Stocks, Bonds, and Insurances
 import stockData from "../stocks.json" // Ensure path is correct
 import bondsData from "../bonds.json"
 import insurancesData from "../insurance.json"
-
-// Code Editor Component
-const CodeEditor = () => {
-  const [code, setCode] = useState("")
-  const [parsedData, setParsedData] = useState([])
-  const [appliedRules, setAppliedRules] = useState([])
-
-  const parseCodeToArray = (input) => {
-    const lines = input.trim().split("\n")
-    const result = lines
-      .map((line) => {
-        const parts = line.trim().split(/\s+/)
-        if (parts.length === 5 && parts[0].toUpperCase() === "IF") {
-          const taskPart = parts[3].toUpperCase()
-          const task = taskPart === "BUY" ? "buy" : taskPart === "SELL" ? "sell" : null
-          if (task) {
-            return {
-              task: task,
-              lower: parts[1],
-              upper: parts[2],
-              stock: parts[4].toUpperCase(),
-            }
-          }
-        }
-        return null
-      })
-      .filter((item) => item !== null)
-
-    return result
-  }
-
-  const handleChange = (e) => {
-    setCode(e.target.value)
-  }
-
-  const handleApplyRule = async () => {
-    const parsedArray = parseCodeToArray(code)
-    setParsedData(parsedArray)
-    setAppliedRules([...appliedRules, ...parsedArray])
-    console.log("Parsed Array:", parsedArray)
-
-    try {
-      const response = await fetch("https://your-api-endpoint.com/trading-rules", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(parsedArray),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log("API Response:", data)
-      } else {
-        console.error("API Error:", response.status)
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error)
-    }
-  }
-
-  const handleDeleteRule = (index) => {
-    const updatedRules = [...appliedRules]
-    updatedRules.splice(index, 1)
-    setAppliedRules(updatedRules)
-  }
-
-  return (
-    <div className="bg-gray-900 rounded-lg overflow-hidden shadow-lg">
-      <div className="p-4 border-b border-gray-700">
-        <h3 className="text-white text-lg font-semibold mb-2">Trading Rules</h3>
-        <p className="text-gray-400 text-sm">Enter rules in format: IF lower upper BUY/SELL stock</p>
-      </div>
-      <div className="p-4">
-        <textarea
-          className="w-full bg-gray-800 text-green-400 font-mono p-4 rounded border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-40"
-          value={code}
-          onChange={handleChange}
-          placeholder="Enter your trading code here... e.g. IF 500 NULL BUY AAPL"
-          spellCheck="false"
-        />
-        <button
-          className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded transition-all duration-200"
-          onClick={handleApplyRule}
-        >
-          Apply Rule
-        </button>
-      </div>
-
-      {appliedRules.length > 0 && (
-        <div className="p-4 border-t border-gray-700">
-          <h4 className="text-white font-medium mb-2">Applied Rules</h4>
-          <div className="space-y-2">
-            {appliedRules.map((rule, index) => (
-              <div key={index} className="flex items-center justify-between bg-gray-800 p-2 rounded">
-                <div className="text-gray-200 font-mono">
-                  IF {rule.lower} {rule.upper} {rule.task.toUpperCase()} {rule.stock}
-                </div>
-                <button onClick={() => handleDeleteRule(index)} className="text-red-400 hover:text-red-500">
-                  <FaTrash />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// Stock Chart Component
-const StockChart = ({ stockData, symbol, timeframe }) => {
-  const [selectedPoints, setSelectedPoints] = useState({ left: null, right: null })
-  const [profit, setProfit] = useState(null)
-  const chartRef = useRef(null)
-
-  // Generate chart data based on stock data and timeframe
-  const generateChartData = () => {
-    if (!stockData || !symbol) return []
-
-    const stock = stockData.find((s) => s["Meta Data"]["2. Symbol"] === symbol)
-    if (!stock) return []
-
-    const timestamps = Object.keys(stock["Time Series (60min)"]).sort()
-
-    // Filter timestamps based on timeframe
-    let filteredTimestamps = timestamps
-    const now = new Date()
-
-    if (timeframe === "daily") {
-      const oneDayAgo = new Date(now)
-      oneDayAgo.setDate(now.getDate() - 1)
-      filteredTimestamps = timestamps.filter((ts) => new Date(ts) >= oneDayAgo)
-    } else if (timeframe === "weekly") {
-      const oneWeekAgo = new Date(now)
-      oneWeekAgo.setDate(now.getDate() - 7)
-      filteredTimestamps = timestamps.filter((ts) => new Date(ts) >= oneWeekAgo)
-    } else if (timeframe === "monthly") {
-      const oneMonthAgo = new Date(now)
-      oneMonthAgo.setMonth(now.getMonth() - 1)
-      filteredTimestamps = timestamps.filter((ts) => new Date(ts) >= oneMonthAgo)
-    } else if (timeframe === "yearly") {
-      const oneYearAgo = new Date(now)
-      oneYearAgo.setFullYear(now.getFullYear() - 1)
-      filteredTimestamps = timestamps.filter((ts) => new Date(ts) >= oneYearAgo)
-    }
-
-    return filteredTimestamps.map((timestamp) => {
-      const data = stock["Time Series (60min)"][timestamp]
-      return {
-        timestamp,
-        price: Number.parseFloat(data["4. close"]),
-        volume: Number.parseInt(data["5. volume"]),
-      }
-    })
-  }
-
-  const chartData = generateChartData()
-
-  // Calculate min and max for dynamic bounds
-  const prices = chartData.map((d) => d.price)
-  const minPrice = Math.min(...prices) * 0.995 // 0.5% lower for better visualization
-  const maxPrice = Math.max(...prices) * 1.005 // 0.5% higher for better visualization
-
-  // Handle double click on chart
-  const handleDoubleClick = (e) => {
-    if (!chartRef.current) return
-
-    const chartElement = chartRef.current
-    const rect = chartElement.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const width = rect.width
-
-    // Find the closest data point
-    const index = Math.round((x / width) * (chartData.length - 1))
-    const point = chartData[index]
-
-    if (!point) return
-
-    if (!selectedPoints.left) {
-      setSelectedPoints({ left: point, right: null })
-    } else if (!selectedPoints.right) {
-      setSelectedPoints({ ...selectedPoints, right: point })
-      // Calculate profit
-      const profitValue = selectedPoints.left.price - point.price
-      setProfit(profitValue.toFixed(2))
-    } else {
-      // Reset selection
-      setSelectedPoints({ left: point, right: null })
-      setProfit(null)
-    }
-  }
-
-  return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{symbol} Chart</h3>
-        {profit !== null && (
-          <div className={`font-medium ${Number.parseFloat(profit) >= 0 ? "text-green-600" : "text-red-600"}`}>
-            Profit: {profit >= 0 ? "+" : ""}
-            {profit}
-          </div>
-        )}
-      </div>
-
-      <div ref={chartRef} className="h-64 w-full" onDoubleClick={handleDoubleClick}>
-        {chartData.length > 0 ? (
-          <Line data={chartData} width={500} height={250} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            {/* Chart components would go here */}
-          </Line>
-        ) : (
-          <div className="h-full flex items-center justify-center text-gray-500">No data available</div>
-        )}
-      </div>
-
-      {selectedPoints.left && (
-        <div className="mt-2 text-sm text-gray-600">
-          Selected: {selectedPoints.left.timestamp}
-          {selectedPoints.right && ` to ${selectedPoints.right.timestamp}`}
-        </div>
-      )}
-    </div>
-  )
-}
 
 export function TradePanel() {
   const [currentPrices, setCurrentPrices] = useState({})
@@ -242,8 +33,14 @@ export function TradePanel() {
   const [activeTab, setActiveTab] = useState("stocks")
   const [filterCategory, setFilterCategory] = useState("")
   const [selectedStocks, setSelectedStocks] = useState([])
-  const [chartTimeframe, setChartTimeframe] = useState("daily")
+  const [timeFilter, setTimeFilter] = useState("daily")
+  const [leftMarker, setLeftMarker] = useState(null)
+  const [rightMarker, setRightMarker] = useState(null)
+  const [profit, setProfit] = useState(null)
+  const [code, setCode] = useState("")
+  const [parsedRules, setParsedRules] = useState([])
   const [showCodeEditor, setShowCodeEditor] = useState(false)
+  const chartRef = useRef(null)
   const navigate = useNavigate()
 
   // Dynamic price updates for Stocks and Bonds (excluding Insurances)
@@ -397,8 +194,11 @@ export function TradePanel() {
     navigate(`/insurance/${insuranceName}`)
   }
 
-  // Handle stock checkbox toggle
-  const handleStockCheckboxToggle = (symbol) => {
+  // Handle checkbox selection
+  const handleStockSelect = (e, stock) => {
+    e.stopPropagation()
+    const symbol = stock["Meta Data"]["2. Symbol"]
+
     if (selectedStocks.includes(symbol)) {
       setSelectedStocks(selectedStocks.filter((s) => s !== symbol))
     } else {
@@ -406,9 +206,152 @@ export function TradePanel() {
     }
   }
 
-  // Toggle code editor visibility
-  const toggleCodeEditor = () => {
-    setShowCodeEditor(!showCodeEditor)
+  // Generate chart data based on selected stocks
+  const getChartData = () => {
+    if (selectedStocks.length === 0) return null
+
+    const labels = []
+    const datasets = []
+
+    // Generate random colors for each stock
+    const colors = [
+      "rgba(255, 99, 132, 1)",
+      "rgba(54, 162, 235, 1)",
+      "rgba(255, 206, 86, 1)",
+      "rgba(75, 192, 192, 1)",
+      "rgba(153, 102, 255, 1)",
+      "rgba(255, 159, 64, 1)",
+      "rgba(199, 199, 199, 1)",
+      "rgba(83, 102, 255, 1)",
+      "rgba(40, 159, 64, 1)",
+      "rgba(210, 199, 199, 1)",
+    ]
+
+    // Get timestamps based on time filter
+    let timeSeriesKey = "Time Series (60min)"
+    switch (timeFilter) {
+      case "yearly":
+        timeSeriesKey = "Time Series (Yearly)"
+        break
+      case "monthly":
+        timeSeriesKey = "Time Series (Monthly)"
+        break
+      case "weekly":
+        timeSeriesKey = "Time Series (Weekly)"
+        break
+      default:
+        timeSeriesKey = "Time Series (60min)"
+    }
+
+    // For demo purposes, we'll use the available 60min data
+    selectedStocks.forEach((symbol, index) => {
+      const stock = stocks.find((s) => s["Meta Data"]["2. Symbol"] === symbol)
+      if (!stock) return
+
+      const timestamps = Object.keys(stock["Time Series (60min)"]).sort()
+
+      if (labels.length === 0) {
+        // Only set labels once from the first stock
+        labels.push(...timestamps)
+      }
+
+      const data = timestamps.map((timestamp) => Number.parseFloat(stock["Time Series (60min)"][timestamp]["4. close"]))
+
+      datasets.push({
+        label: symbol,
+        data: data,
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length].replace("1)", "0.2)"),
+        borderWidth: 2,
+        pointRadius: 1,
+        pointHoverRadius: 5,
+      })
+    })
+
+    return {
+      labels,
+      datasets,
+    }
+  }
+
+  // Handle chart double click for markers
+  const handleChartDoubleClick = (event) => {
+    if (!chartRef.current) return
+
+    const chart = chartRef.current
+    const canvasPosition = chart.canvas.getBoundingClientRect()
+    const x = event.clientX - canvasPosition.left
+
+    // Convert x position to data index
+    const xScale = chart.scales.x
+    const index = xScale.getValueForPixel(x)
+
+    if (leftMarker === null || rightMarker !== null) {
+      // Set left marker if none exists or reset both markers
+      setLeftMarker(index)
+      setRightMarker(null)
+      setProfit(null)
+    } else {
+      // Set right marker if left marker exists
+      setRightMarker(index)
+
+      // Calculate profit between markers
+      if (selectedStocks.length > 0) {
+        const stock = stocks.find((s) => s["Meta Data"]["2. Symbol"] === selectedStocks[0])
+        if (stock) {
+          const timestamps = Object.keys(stock["Time Series (60min)"]).sort()
+          const leftPrice = Number.parseFloat(stock["Time Series (60min)"][timestamps[leftMarker]]["4. close"])
+          const rightPrice = Number.parseFloat(stock["Time Series (60min)"][timestamps[index]]["4. close"])
+          const profitValue = (rightPrice - leftPrice).toFixed(2)
+          const profitPercent = (((rightPrice - leftPrice) / leftPrice) * 100).toFixed(2)
+          setProfit({ value: profitValue, percent: profitPercent })
+        }
+      }
+    }
+  }
+
+  // Parse code to trading rules
+  const parseCodeToArray = (input) => {
+    const lines = input.trim().split("\n")
+    const result = lines
+      .map((line) => {
+        const parts = line.trim().split(/\s+/)
+        if (parts.length === 5 && parts[0].toUpperCase() === "IF") {
+          const taskPart = parts[3].toUpperCase()
+          const task = taskPart === "BUY" ? "buy" : taskPart === "SELL" ? "sell" : null
+          if (task) {
+            return {
+              task: task,
+              lower: parts[1],
+              upper: parts[2],
+              stock: parts[4].toUpperCase(),
+            }
+          }
+        }
+        return null
+      })
+      .filter((item) => item !== null)
+
+    return result
+  }
+
+  // Handle code change
+  const handleCodeChange = (e) => {
+    setCode(e.target.value)
+  }
+
+  // Apply trading rule
+  const handleApplyRule = () => {
+    const newRules = parseCodeToArray(code)
+    setParsedRules([...parsedRules, ...newRules])
+    setCode("")
+  }
+
+  // Delete rule
+  const handleDeleteRule = (index) => {
+    const updatedRules = [...parsedRules]
+    updatedRules.splice(index, 1)
+    setParsedRules(updatedRules)
   }
 
   return (
@@ -440,10 +383,11 @@ export function TradePanel() {
                   />
                 </div>
                 <button
-                  onClick={toggleCodeEditor}
-                  className="px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all duration-200"
+                  onClick={() => setShowCodeEditor(!showCodeEditor)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all duration-200"
                 >
-                  {showCodeEditor ? "Hide Code Editor" : "Show Code Editor"}
+                  <FaCode />
+                  <span>Code Editor</span>
                 </button>
               </div>
             </div>
@@ -492,41 +436,145 @@ export function TradePanel() {
             )}
           </div>
 
-          {/* Code Editor Section */}
-          {showCodeEditor && (
-            <div className="p-4 border-b border-gray-200">
-              <CodeEditor />
-            </div>
-          )}
-
-          {/* Chart Timeframe Selector (only visible when stocks are selected) */}
+          {/* Chart Section */}
           {selectedStocks.length > 0 && (
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <FaChartLine className="text-indigo-500" />
-                  Chart View
-                </h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600">Timeframe:</span>
-                  <select
-                    value={chartTimeframe}
-                    onChange={(e) => setChartTimeframe(e.target.value)}
-                    className="p-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Stock Performance</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setTimeFilter("daily")}
+                    className={`px-3 py-1 text-sm rounded-md ${timeFilter === "daily" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
                   >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
+                    Daily
+                  </button>
+                  <button
+                    onClick={() => setTimeFilter("weekly")}
+                    className={`px-3 py-1 text-sm rounded-md ${timeFilter === "weekly" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  >
+                    Weekly
+                  </button>
+                  <button
+                    onClick={() => setTimeFilter("monthly")}
+                    className={`px-3 py-1 text-sm rounded-md ${timeFilter === "monthly" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setTimeFilter("yearly")}
+                    className={`px-3 py-1 text-sm rounded-md ${timeFilter === "yearly" ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  >
+                    Yearly
+                  </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {selectedStocks.map((symbol) => (
-                  <StockChart key={symbol} stockData={stocks} symbol={symbol} timeframe={chartTimeframe} />
-                ))}
+              <div className="relative h-80" onDoubleClick={handleChartDoubleClick}>
+                {getChartData() && (
+                  <Line
+                    ref={chartRef}
+                    data={getChartData()}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: {
+                        mode: "index",
+                        intersect: false,
+                      },
+                      plugins: {
+                        legend: {
+                          position: "top",
+                        },
+                        tooltip: {
+                          enabled: true,
+                        },
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: false,
+                        },
+                      },
+                    }}
+                  />
+                )}
+
+                {profit && (
+                  <div className="absolute top-2 right-2 bg-white p-3 rounded-lg shadow-md border border-gray-200">
+                    <p className="text-sm font-medium">Profit between markers:</p>
+                    <p
+                      className={`text-lg font-bold ${profit.value > 0 ? "text-green-600" : profit.value < 0 ? "text-red-600" : "text-gray-600"}`}
+                    >
+                      {profit.value > 0 ? "+" : ""}
+                      {profit.value} ({profit.value > 0 ? "+" : ""}
+                      {profit.percent}%)
+                    </p>
+                  </div>
+                )}
               </div>
+
+              <p className="text-sm text-gray-500 mt-2">
+                Double-click on the chart to set markers and calculate profit between points.
+              </p>
+            </div>
+          )}
+
+          {/* Code Editor Section */}
+          {showCodeEditor && (
+            <div className="p-6 border-b bg-gray-900">
+              <h3 className="text-lg font-semibold text-white mb-4">Trading Rules Editor</h3>
+
+              <div className="mb-4">
+                <div className="bg-black rounded-t-lg p-2 text-xs text-gray-400 border-b border-gray-700">
+                  trading-rules.js
+                </div>
+                <textarea
+                  className="w-full h-40 bg-black text-green-400 font-mono p-4 outline-none border-0 rounded-b-lg resize-none"
+                  value={code}
+                  onChange={handleCodeChange}
+                  placeholder="Enter your trading code here... e.g. IF 500 NULL BUY AAPL"
+                  spellCheck="false"
+                  style={{
+                    caretColor: "white",
+                    lineHeight: "1.5",
+                    fontSize: "14px",
+                  }}
+                />
+              </div>
+
+              <button
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                onClick={handleApplyRule}
+              >
+                Apply Rule
+              </button>
+
+              {parsedRules.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-md font-medium text-white mb-2">Applied Rules:</h4>
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    {parsedRules.map((rule, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0"
+                      >
+                        <div className="text-gray-200">
+                          <span className="text-indigo-400">IF</span> {rule.lower} {rule.upper}{" "}
+                          <span className={rule.task === "buy" ? "text-green-400" : "text-red-400"}>
+                            {rule.task.toUpperCase()}
+                          </span>{" "}
+                          <span className="text-yellow-400">{rule.stock}</span>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteRule(index)}
+                          className="text-gray-400 hover:text-red-400 transition-colors"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -536,7 +584,7 @@ export function TradePanel() {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50 text-gray-700 sticky top-0 z-10 shadow-sm">
                   <tr>
-                    <th className="py-4 px-3 font-semibold text-sm uppercase tracking-wide">Select</th>
+                    <th className="py-4 px-2 font-semibold text-sm uppercase tracking-wide">Select</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Symbol</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Price (₹)</th>
                     <th className="py-4 px-6 font-semibold text-sm uppercase tracking-wide">Change</th>
@@ -551,29 +599,23 @@ export function TradePanel() {
                   {filteredStocks.map((stock, index) => {
                     const { price, trend, change, volume, high, low, open, percentChange } = getStockInfo(stock)
                     const symbol = stock["Meta Data"]["2. Symbol"]
-                    const isSelected = selectedStocks.includes(symbol)
-
                     return (
                       <tr
                         key={symbol}
                         className={`${
                           index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-indigo-100 transition-all duration-200 ${isSelected ? "bg-indigo-50" : ""}`}
+                        } hover:bg-indigo-100 cursor-pointer transition-all duration-200`}
+                        onClick={() => handleStockClick(symbol)}
                       >
-                        <td className="py-4 px-3 text-center">
+                        <td className="py-4 px-2 text-center" onClick={(e) => e.stopPropagation()}>
                           <input
                             type="checkbox"
-                            checked={isSelected}
-                            onChange={() => handleStockCheckboxToggle(symbol)}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            checked={selectedStocks.includes(symbol)}
+                            onChange={(e) => handleStockSelect(e, stock)}
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                           />
                         </td>
-                        <td
-                          className="py-4 px-6 font-medium text-gray-800 cursor-pointer"
-                          onClick={() => handleStockClick(symbol)}
-                        >
-                          {symbol}
-                        </td>
+                        <td className="py-4 px-6 font-medium text-gray-800">{symbol}</td>
                         <td className="py-4 px-6 font-semibold text-gray-900">₹{price}</td>
                         <td className="py-4 px-6">
                           <span
