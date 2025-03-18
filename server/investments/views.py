@@ -11,10 +11,10 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from django.db import models
 from decimal import Decimal
-import logging
+# import logging
 
 # Configure logging
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(_name_)
 
 class PortfolioView(APIView):
     def get(self, request, id=None):
@@ -28,40 +28,40 @@ class PortfolioView(APIView):
 
 class TransactionView(APIView):
     def get(self, request, id=None):
-        logger.info(f"GET request received with id={id}")
+        # logger.info(f"GET request received with id={id}")
         if not id:
-            logger.error("User ID is required for GET requests")
+            # logger.error("User ID is required for GET requests")
             return Response({"error": "User ID is required for GET requests"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             profile = UserProfile.objects.get(user__id=id)
-            logger.info(f"Found UserProfile for user_id={id}")
+            # logger.info(f"Found UserProfile for user_id={id}")
             transactions = Transaction.objects.filter(user_profile=profile)
             serializer = TransactionSerializer(transactions, many=True)
-            logger.info(f"Returning {len(serializer.data)} transactions for user_id={id}")
+            # logger.info(f"Returning {len(serializer.data)} transactions for user_id={id}")
             return Response(serializer.data)
         except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile not found for user_id={id}")
+            # logger.error(f"UserProfile not found for user_id={id}")
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, id=None):
-        logger.info(f"POST request received with data: {request.data}")
+        # logger.info(f"POST request received with data: {request.data}")
         
         user_id = request.data.get('user_id')
         asset_type = request.data.get('asset_type')
         if not user_id:
-            logger.error("user_id is missing in request data")
+            # logger.error("user_id is missing in request data")
             return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             profile = UserProfile.objects.get(user__id=user_id)
-            logger.info(f"Found UserProfile for user_id={user_id}")
+            # logger.info(f"Found UserProfile for user_id={user_id}")
 
             asset_symbol = request.data.get('asset_symbol')
             price = request.data.get('price')
             quantity = request.data.get('quantity', 0)
             transaction_type = request.data.get('transaction_type')
 
-            logger.info(f"Parsed data: asset_symbol={asset_symbol}, price={price}, quantity={quantity}, transaction_type={transaction_type}")
+            # logger.info(f"Parsed data: asset_symbol={asset_symbol}, price={price}, quantity={quantity}, transaction_type={transaction_type}")
 
             if not all([asset_symbol, price, quantity, transaction_type]):
                 missing_fields = [field for field, value in {
@@ -70,35 +70,35 @@ class TransactionView(APIView):
                     "quantity": quantity,
                     "transaction_type": transaction_type
                 }.items() if not value]
-                logger.error(f"Missing required fields: {missing_fields}")
+                # logger.error(f"Missing required fields: {missing_fields}")
                 return Response({"error": f"Missing required fields: {missing_fields}"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Convert and validate price
             try:
                 price = Decimal(str(price))
                 if price <= 0:
-                    logger.error(f"Invalid price: {price} (must be positive)")
+                    # logger.error(f"Invalid price: {price} (must be positive)")
                     return Response({"error": "Price must be a positive number"}, status=status.HTTP_400_BAD_REQUEST)
             except (ValueError, TypeError) as e:
-                logger.error(f"Failed to convert price '{price}' to Decimal: {str(e)}")
+                # logger.error(f"Failed to convert price '{price}' to Decimal: {str(e)}")
                 return Response({"error": f"Invalid price format: '{price}'"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Convert and validate quantity
             try:
                 quantity = int(quantity)
                 if quantity <= 0:
-                    logger.error(f"Invalid quantity: {quantity} (must be positive)")
+                    # logger.error(f"Invalid quantity: {quantity} (must be positive)")
                     return Response({"error": "Quantity must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
             except (ValueError, TypeError) as e:
-                logger.error(f"Failed to convert quantity '{quantity}' to int: {str(e)}")
+                # logger.error(f"Failed to convert quantity '{quantity}' to int: {str(e)}")
                 return Response({"error": f"Invalid quantity format: '{quantity}'"}, status=status.HTTP_400_BAD_REQUEST)
 
             amount = price * quantity
-            logger.info(f"Calculated amount: {amount}")
+            # logger.info(f"Calculated amount: {amount}")
 
             if transaction_type == 'buy':
                 if profile.balance < amount:
-                    logger.error(f"Insufficient balance: {profile.balance} < {amount}")
+                    # logger.error(f"Insufficient balance: {profile.balance} < {amount}")
                     return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
                 profile.balance -= amount
                 profile.boughtsum += amount
@@ -108,16 +108,16 @@ class TransactionView(APIView):
                     profile.bonds += amount
                 else:
                     profile.insurance += amount
-                logger.info(f"Buying {quantity} of {asset_symbol} at {price} for {amount}")
+                # logger.info(f"Buying {quantity} of {asset_symbol} at {price} for {amount}")
 
                 # Check if Portfolio exists, create or update accordingly
                 try:
                     portfolio = Portfolio.objects.get(user_profile=profile, asset_symbol=asset_symbol)
-                    logger.info(f"Found existing portfolio for {asset_symbol}, updating quantity")
+                    # logger.info(f"Found existing portfolio for {asset_symbol}, updating quantity")
                     portfolio.quantity = models.F('quantity') + quantity
                     portfolio.save()
                 except Portfolio.DoesNotExist:
-                    logger.info(f"No portfolio found for {asset_symbol}, creating new entry")
+                    # logger.info(f"No portfolio found for {asset_symbol}, creating new entry")
                     Portfolio.objects.create(
                         user_profile=profile,
                         asset_symbol=asset_symbol,
@@ -128,7 +128,7 @@ class TransactionView(APIView):
                 try:
                     portfolio = Portfolio.objects.get(user_profile=profile, asset_symbol=asset_symbol)
                     if portfolio.quantity < quantity:
-                        logger.error(f"Not enough assets to sell: {portfolio.quantity} < {quantity}")
+                        # logger.error(f"Not enough assets to sell: {portfolio.quantity} < {quantity}")
                         return Response({"error": "Not enough assets to sell"}, status=status.HTTP_400_BAD_REQUEST)
                     
                     # Calculate profit/loss
@@ -146,7 +146,7 @@ class TransactionView(APIView):
                         remaining_quantity -= qty_to_use
                     
                     profit_loss = (amount - total_buy_cost).quantize(Decimal('0.01'))
-                    logger.info(f"Selling {quantity} of {asset_symbol} at {price} for {amount}. Profit/Loss: {profit_loss}")
+                    # logger.info(f"Selling {quantity} of {asset_symbol} at {price} for {amount}. Profit/Loss: {profit_loss}")
 
                     profile.balance += amount
                     profile.boughtsum -= amount
@@ -160,16 +160,16 @@ class TransactionView(APIView):
                     portfolio.quantity -= quantity
                     if portfolio.quantity == 0:
                         portfolio.delete()
-                        logger.info(f"Deleted portfolio entry for {asset_symbol}")
+                        # logger.info(f"Deleted portfolio entry for {asset_symbol}")
                     else:
                         portfolio.save()
-                        logger.info(f"Updated portfolio quantity for {asset_symbol} to {portfolio.quantity}")
+                        # logger.info(f"Updated portfolio quantity for {asset_symbol} to {portfolio.quantity}")
 
                 except Portfolio.DoesNotExist:
-                    logger.error(f"Portfolio entry not found for {asset_symbol}")
+                    # logger.error(f"Portfolio entry not found for {asset_symbol}")
                     return Response({"error": "Portfolio entry not found"}, status=status.HTTP_404_NOT_FOUND)
             else:
-                logger.error(f"Invalid transaction_type: {transaction_type}")
+                # logger.error(f"Invalid transaction_type: {transaction_type}")
                 return Response({"error": "Invalid transaction_type"}, status=status.HTTP_400_BAD_REQUEST)
 
             if profile.boughtsum < 0:
@@ -178,27 +178,27 @@ class TransactionView(APIView):
                 profile.stocks = 0
 
             profile.save()
-            logger.info(f"Updated UserProfile: balance={profile.balance}, boughtsum={profile.boughtsum}, stocks={profile.stocks}")
+            # logger.info(f"Updated UserProfile: balance={profile.balance}, boughtsum={profile.boughtsum}, stocks={profile.stocks}")
 
             transaction = Transaction.objects.create(
                 user_profile=profile, asset_symbol=asset_symbol, quantity=quantity,
                 transaction_type=transaction_type, price=price, amount=amount
             )
             serializer = TransactionSerializer(transaction)
-            logger.info(f"Created transaction: {transaction}")
+            # logger.info(f"Created transaction: {transaction}")
 
             response_data = serializer.data
             if transaction_type == 'sell':
                 response_data['profit_loss'] = str(profit_loss)
-                logger.info(f"Added profit_loss to response: {profit_loss}")
+                # logger.info(f"Added profit_loss to response: {profit_loss}")
 
             return Response(response_data, status=status.HTTP_201_CREATED)
 
         except UserProfile.DoesNotExist:
-            logger.error(f"UserProfile not found for user_id={user_id}")
+            # logger.error(f"UserProfile not found for user_id={user_id}")
             return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
+            # logger.error(f"Unexpected error: {str(e)}")
             return Response({"error": f"Unexpected error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SentimentAnalysisView(APIView):
@@ -235,10 +235,10 @@ def agent_chat(request):
     prompt = f"""
     You are a financial agent for an investment portal. The user (ID: {user_id}) asked: "{query}".
     You can:
-    - Buy assets: Call `tools.buy_asset(user_id, asset_name, quantity)`
-    - Sell assets: Call `tools.sell_asset(user_id, asset_name, quantity)`
-    - Check portfolio: Call `tools.get_portfolio(user_id)`
-    - Get sentiment: Call `tools.get_sentiment(asset_name)` (returns {{'sentiment': {{'score': float, 'sentiment': str}}}})
+    - Buy assets: Call tools.buy_asset(user_id, asset_name, quantity)
+    - Sell assets: Call tools.sell_asset(user_id, asset_name, quantity)
+    - Check portfolio: Call tools.get_portfolio(user_id)
+    - Get sentiment: Call tools.get_sentiment(asset_name) (returns {{'sentiment': {{'score': float, 'sentiment': str}}}})
     - Fetch stock data: Use yfinance (e.g., yf.Ticker('AAPL').info)
     - User risk tolerance: {risk_tolerance}
 

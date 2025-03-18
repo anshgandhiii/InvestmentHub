@@ -5,8 +5,8 @@ import { TradePanel } from "./TradePanel";
 import InvestmentSuggestions from "./InvestmentSuggessions";
 import SipCalculator from "./SipCalculator";
 import InsurancePurchase from "./InsurancePurchase";
-import stockData from "../stocks.json"; // Import stocks.json
-import bondsData from "../bonds.json"; // Import bonds.json
+import stockData from "../stocks.json";
+import bondsData from "../bonds.json";
 import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -47,16 +47,20 @@ export default function Dashboard() {
     return savedHistory ? JSON.parse(savedHistory) : [];
   });
   const [timeSlot, setTimeSlot] = useState("All");
+  const [addFundsAmount, setAddFundsAmount] = useState("");
+  const [isAddingFunds, setIsAddingFunds] = useState(false);
+  const [message, setMessage] = useState(null); // For success/error messages
   const stocks = stockData.stocks || [];
   const bonds = bondsData || [];
 
+  // Fetch initial data
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
         const portfolioResponse = await axios.get(`http://127.0.0.1:8000/investment/portfolio/${userId}/`, {
           headers: { "User-Id": userId },
         });
-        const profileResponse = await axios.get(`http://127.0.0.1:8000/user/profile/${userId}`, {
+        const profileResponse = await axios.get(`http://127.0.0.1:8000/user/profile/${userId}/`, {
           headers: { "User-Id": userId },
         });
 
@@ -156,46 +160,46 @@ export default function Dashboard() {
       {
         title: "Portfolio",
         value: `$${totalPortfolio.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        icon: <FaDollarSign className="h-6 w-6 text-indigo-500" />,
+        icon: <FaDollarSign className="h-6 w-6 text-blue-600" />,
         trend: portfolioTrend.percentage,
         trendIcon: portfolioTrend.direction === "up" ? (
-          <FaArrowUp className="h-4 w-4 text-green-500" />
+          <FaArrowUp className="h-4 w-4 text-green-600" />
         ) : portfolioTrend.direction === "down" ? (
-          <FaArrowDown className="h-4 w-4 text-red-500" />
+          <FaArrowDown className="h-4 w-4 text-red-600" />
         ) : null,
-        trendColor: portfolioTrend.direction === "up" ? "bg-green-100 text-green-600" : portfolioTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+        trendColor: portfolioTrend.direction === "up" ? "bg-green-50 text-green-700" : portfolioTrend.direction === "down" ? "bg-red-50 text-red-700" : "bg-gray-50 text-gray-600",
       },
       {
         title: "Stocks",
         value: `$${stocksValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        icon: <FaChartLine className="h-6 w-6 text-indigo-500" />,
+        icon: <FaChartLine className="h-6 w-6 text-blue-600" />,
         trend: stocksTrend.percentage,
         trendIcon: stocksTrend.direction === "up" ? (
-          <FaArrowUp className="h-4 w-4 text-green-500" />
+          <FaArrowUp className="h-4 w-4 text-green-600" />
         ) : stocksTrend.direction === "down" ? (
-          <FaArrowDown className="h-4 w-4 text-red-500" />
+          <FaArrowDown className="h-4 w-4 text-red-600" />
         ) : null,
-        trendColor: stocksTrend.direction === "up" ? "bg-green-100 text-green-600" : stocksTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+        trendColor: stocksTrend.direction === "up" ? "bg-green-50 text-green-700" : stocksTrend.direction === "down" ? "bg-red-50 text-red-700" : "bg-gray-50 text-gray-600",
       },
       {
         title: "Bonds",
         value: `$${bondsValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        icon: <FaChartBar className="h-6 w-6 text-indigo-500" />,
+        icon: <FaChartBar className="h-6 w-6 text-blue-600" />,
         trend: bondsTrend.percentage,
         trendIcon: bondsTrend.direction === "up" ? (
-          <FaArrowUp className="h-4 w-4 text-green-500" />
+          <FaArrowUp className="h-4 w-4 text-green-600" />
         ) : bondsTrend.direction === "down" ? (
-          <FaArrowDown className="h-4 w-4 text-red-500" />
+          <FaArrowDown className="h-4 w-4 text-red-600" />
         ) : null,
-        trendColor: bondsTrend.direction === "up" ? "bg-green-100 text-green-600" : bondsTrend.direction === "down" ? "bg-red-100 text-red-600" : "bg-gray-100 text-gray-600",
+        trendColor: bondsTrend.direction === "up" ? "bg-green-50 text-green-700" : bondsTrend.direction === "down" ? "bg-red-50 text-red-700" : "bg-gray-50 text-gray-600",
       },
       {
         title: "Insurance",
         value: `$${insuranceValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        icon: <FaChartPie className="h-6 w-6 text-indigo-500" />,
+        icon: <FaChartPie className="h-6 w-6 text-blue-600" />,
         trend: insuranceTrend.percentage,
         trendIcon: null,
-        trendColor: "bg-gray-100 text-gray-600",
+        trendColor: "bg-gray-50 text-gray-600",
       },
     ];
 
@@ -222,11 +226,10 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [loading, portfolioData, profile]);
 
-  // Function to reset performance history
   const resetPerformanceHistory = () => {
     if (userId) {
-         // Clear from localStorage
-      setPerformanceHistory([]); // Reset state to empty array
+      localStorage.removeItem(`performanceHistory_${userId}`);
+      setPerformanceHistory([]);
     }
   };
 
@@ -262,18 +265,56 @@ export default function Dashboard() {
           label: "Portfolio Value",
           data: filteredHistory.map((entry) => entry.value),
           fill: true,
-          backgroundColor: "rgba(79, 70, 229, 0.2)",
-          borderColor: "rgba(79, 70, 229, 1)",
+          backgroundColor: "rgba(59, 130, 246, 0.1)",
+          borderColor: "rgba(59, 130, 246, 1)",
           borderWidth: 2,
-          tension: 0,
-          pointRadius: 3,
+          tension: 0.3,
+          pointRadius: 0,
         },
       ],
     };
   };
 
-  const performanceData = filterPerformanceData();
+  const handleAddFunds = async () => {
+    if (!addFundsAmount || parseFloat(addFundsAmount) <= 0) {
+      setMessage({ type: "error", text: "Please enter a valid amount." });
+      return;
+    }
 
+    setIsAddingFunds(true);
+    setMessage(null); // Clear previous message
+    try {
+      const currentBalance = parseFloat(profile.balance || 0);
+      const amountToAdd = parseFloat(addFundsAmount);
+      const newBalance = currentBalance + amountToAdd;
+
+      const response = await axios.put(
+        `http://127.0.0.1:8000/user/profile/${userId}/`,
+        { balance: newBalance.toFixed(2) }, // Ensure string format
+        { headers: { "User-Id": userId } }
+      );
+
+      if (response.status === 200) {
+        setProfile(response.data);
+        setAddFundsAmount("");
+        setMessage({
+          type: "success",
+          text: `Successfully added $${amountToAdd.toLocaleString("en-US")} to your account.`,
+        });
+        setTimeout(() => {
+          document.getElementById("addFundsModal").close();
+          setMessage(null);
+        }, 2000); // Close modal after 2 seconds
+      }
+    } catch (error) {
+      console.error("Error adding funds:", error);
+      setMessage({ type: "error", text: "Failed to add funds. Please try again." });
+    } finally {
+      setIsAddingFunds(false);
+    }
+  };
+
+  const performanceData = filterPerformanceData();
   const stocksValue = portfolioSummary.find((item) => item.title === "Stocks")?.value.replace("$", "").replace(/,/g, "") || 0;
   const bondsValue = portfolioSummary.find((item) => item.title === "Bonds")?.value.replace("$", "").replace(/,/g, "") || 0;
   const insuranceValue = portfolioSummary.find((item) => item.title === "Insurance")?.value.replace("$", "").replace(/,/g, "") || 0;
@@ -288,9 +329,9 @@ export default function Dashboard() {
           totalPortfolio ? (parseFloat(bondsValue) / totalPortfolio) * 100 : 0,
           totalPortfolio ? (parseFloat(insuranceValue) / totalPortfolio) * 100 : 0,
         ],
-        backgroundColor: ["#4F46E5", "#10B981", "#F59E0B"],
+        backgroundColor: ["#3B82F6", "#10B981", "#F59E0B"],
         borderWidth: 1,
-        borderColor: "#fff",
+        borderColor: "#ffffff",
       },
     ],
   };
@@ -303,14 +344,28 @@ export default function Dashboard() {
       tooltip: {
         mode: "index",
         intersect: false,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: { size: 14 },
+        bodyFont: { size: 12 },
         callbacks: { label: (context) => `$${context.parsed.y.toLocaleString("en-US")}` },
       },
     },
     scales: {
-      x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+      x: { 
+        grid: { display: false }, 
+        ticks: { 
+          maxTicksLimit: 8, 
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#6B7280",
+        } 
+      },
       y: {
         grid: { color: "rgba(0, 0, 0, 0.05)" },
-        ticks: { callback: (value) => `$${value.toLocaleString("en-US")}` },
+        ticks: { 
+          callback: (value) => `$${value.toLocaleString("en-US")}`, 
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#6B7280",
+        },
       },
     },
   };
@@ -322,6 +377,9 @@ export default function Dashboard() {
       legend: {
         position: "bottom",
         labels: {
+          font: { size: 12, family: "'Inter', sans-serif" },
+          color: "#374151",
+          padding: 15,
           generateLabels: (chart) => {
             const data = chart.data;
             return data.labels.map((label, i) => ({
@@ -334,26 +392,27 @@ export default function Dashboard() {
     },
   };
 
-  const handleAddFunds = () => {
-    alert("Redirecting to payment gateway to add funds...");
-  };
-
   if (loading) {
-    return <div className="text-center p-6">Loading dashboard...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="text-gray-600 text-lg font-medium">Loading Dashboard...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-100 p-6 font-sans">
+      {/* Portfolio Summary */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         {portfolioSummary.map((item, index) => (
           <div
             key={index}
-            className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1"
+            className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 {item.icon}
-                <h2 className="text-sm font-semibold text-gray-700">{item.title}</h2>
+                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{item.title}</h2>
               </div>
               {item.trend && (
                 <span className={`text-xs font-medium px-2 py-1 rounded-full ${item.trendColor}`}>
@@ -366,31 +425,40 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="tabs bg-white rounded-xl shadow-md p-3 flex justify-start gap-3 mb-8 overflow-x-auto">
-        {["overview", "trade", "suggestions", "SIP", "Insurance"].map((tab) => (
-          <button
-            key={tab}
-            className={`tab px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === tab ? "bg-indigo-600 text-white shadow-md" : "text-gray-600 hover:bg-indigo-50"
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+      {/* Tabs */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+        <div className="flex space-x-4 overflow-x-auto">
+          {["overview", "trade", "suggestions", "SIP"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-6 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTab === tab
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="animate-fade-in space-y-8">
+      {/* Main Content */}
+      <div className="space-y-8">
         {activeTab === "overview" && (
           <>
-            <div className="card bg-base-100 shadow-md p-4">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Account Balance</h3>
-                <button className="btn btn-sm btn-outline btn-primary" onClick={handleAddFunds}>
+                <h3 className="text-lg font-semibold text-gray-800">Account Balance</h3>
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  onClick={() => document.getElementById("addFundsModal").showModal()}
+                >
                   Add Funds
                 </button>
               </div>
-              <p className="text-xl font-bold">
+              <p className="mt-2 text-2xl font-bold text-gray-900">
                 ${profile.balance
                   ? parseFloat(profile.balance).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
@@ -398,30 +466,101 @@ export default function Dashboard() {
                     })
                   : "0.00"}
               </p>
-              <p className="text-gray-500 text-sm">Last deposit: $2,000 on Mar 10, 2025</p>
+              <p className="mt-1 text-sm text-gray-500">Last deposit: $2,000 on Mar 10, 2025</p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <div className="bg-white p-6 rounded-xl shadow-md col-span-2">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <FaChartLine className="text-indigo-500" /> Performance
-                  </h2>
-                  <button
-                    className="btn btn-sm btn-outline btn-warning"
-                    onClick={resetPerformanceHistory}
+
+            {/* Add Funds Modal */}
+            <dialog id="addFundsModal" className="modal modal-middle">
+              <div className="modal-box bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+                <h3 className="text-xl font-semibold text-gray-800 text-center mb-4">Add Funds</h3>
+                <p className="text-gray-600 text-center mb-6">Enter the amount to deposit into your account</p>
+                
+                {/* Message Banner */}
+                {message && (
+                  <div
+                    className={`p-3 rounded-md mb-4 text-sm font-medium text-center transition-all duration-300 ${
+                      message.type === "success"
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
                   >
-                    Reset Graph
+                    {message.text}
+                  </div>
+                )}
+
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    value={addFundsAmount}
+                    onChange={(e) => setAddFundsAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-center"
+                    min="0"
+                    step="0.01"
+                    disabled={isAddingFunds}
+                  />
+                </div>
+
+                <div className="mt-6 flex justify-center gap-4">
+                  <button
+                    className={`px-6 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors ${
+                      isAddingFunds ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={handleAddFunds}
+                    disabled={isAddingFunds}
+                  >
+                    {isAddingFunds ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h-8z" />
+                        </svg>
+                        Processing...
+                      </span>
+                    ) : (
+                      "Add Funds"
+                    )}
+                  </button>
+                  <button
+                    className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-300 transition-colors"
+                    onClick={() => {
+                      document.getElementById("addFundsModal").close();
+                      setMessage(null); // Clear message on close
+                    }}
+                    disabled={isAddingFunds}
+                  >
+                    Cancel
                   </button>
                 </div>
-                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4">
+              </div>
+            </dialog>
+
+            {/* Charts */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 col-span-2">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <FaChartLine className="text-blue-600" /> Portfolio Performance
+                  </h2>
+                  <button
+                    className="px-3 py-1 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 transition-colors"
+                    onClick={resetPerformanceHistory}
+                  >
+                    Reset
+                  </button>
+                </div>
+                <div className="h-80">
                   <Line data={performanceData} options={performanceOptions} />
                 </div>
                 <div className="mt-4 flex justify-center gap-2">
                   {["1H", "1D", "1W", "1M", "All"].map((slot) => (
                     <button
                       key={slot}
-                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                        timeSlot === slot ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-indigo-100"
+                      className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                        timeSlot === slot
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                       onClick={() => setTimeSlot(slot)}
                     >
@@ -430,11 +569,11 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-md">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  <FaChartPie className="text-indigo-500" /> Allocation
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                  <FaChartPie className="text-blue-600" /> Asset Allocation
                 </h2>
-                <div className="h-72 bg-gradient-to-br from-gray-50 to-indigo-50 rounded-lg mt-4">
+                <div className="h-80">
                   <Pie data={allocationData} options={allocationOptions} />
                 </div>
               </div>
