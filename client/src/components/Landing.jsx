@@ -395,10 +395,7 @@ useEffect(() => {
   };
 
   const navItems = [
-    { label: "Home", path: "/", active: true },
-    { label: "Features", path: "#features", active: false },
-    { label: "About", path: "#about", active: false },
-    { label: "Contact", path: "#contact", active: false },
+    { label: "Home", path: "/landing", active: true },
   ];
 
   // Handle time frame selection for each index

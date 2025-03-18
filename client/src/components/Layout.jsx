@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { FaChartLine, FaBars, FaNewspaper, FaHistory, FaGamepad } from "react-icons/fa";
 
 export function Layout() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  
+  // Assuming storedUserId is available from somewhere (you might need to adjust this)
+  const storedUserId = localStorage.getItem("user_id"); // Replace with actual user ID source (localStorage, context, etc.)
 
   const navItems = [
     { label: "Dashboard", path: "/dashboard", active: true },
@@ -14,7 +18,6 @@ export function Layout() {
 
   const sidebarItems = [
     { label: "News", icon: <FaNewspaper className="h-5 w-5 text-indigo-500" />, path: "/news", active: true },
-    { label: "History", icon: <FaHistory className="h-5 w-5 text-indigo-500" />, action: () => alert("Transaction History section coming soon!") },
     { label: "Virtual Trading", icon: <FaGamepad className="h-5 w-5 text-indigo-500" />, path: "/VirtualMarket", active: true },
   ];
 
@@ -23,12 +26,25 @@ export function Layout() {
     { title: "Tech Stocks Surge", date: "Mar 14, 2025" },
   ];
 
-  const transactionHistory = [
-    { type: "Buy AAPL", amount: "-$913.15", date: "Mar 12, 2025" },
-    { type: "Deposit", amount: "+$2,000.00", date: "Mar 10, 2025" },
-  ];
-
   const virtualTradingStats = { balance: "$10,000.00", gainLoss: "+5.2%" };
+
+  const fetchTransactions = async () => {
+    if (!storedUserId) return;
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/investment/transactions/${storedUserId}/`);
+      if (!response.ok) throw new Error("Failed to fetch transactions");
+      const data = await response.json();
+      setTransactions(data);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+
+  // Fetch transactions when component mounts
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-gray-100">
@@ -95,23 +111,13 @@ export function Layout() {
             <ul className="space-y-3">
               {sidebarItems.map((item) => (
                 <li key={item.label}>
-                  {item.path ? (
-                    <Link
-                      to={item.path}
-                      className="w-full flex items-center gap-3 p-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all shadow-sm"
-                    >
-                      {item.icon}
-                      {item.label}
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={item.action}
-                      className="w-full flex items-center gap-3 p-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all shadow-sm"
-                    >
-                      {item.icon}
-                      {item.label}
-                    </button>
-                  )}
+                  <Link
+                    to={item.path}
+                    className="w-full flex items-center gap-3 p-3 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-indigo-100 hover:text-indigo-600 rounded-lg transition-all shadow-sm"
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -133,20 +139,22 @@ export function Layout() {
               <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                 <FaHistory className="text-indigo-500" /> Transactions
               </h4>
-              {transactionHistory.map((tx, index) => (
+              {transactions.map((tx, index) => (
                 <div key={index} className="bg-gray-50 p-3 rounded-lg shadow-sm flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-gray-700">{tx.type}</p>
-                    <p className="text-xs text-gray-500">{tx.date}</p>
+                    <p className="text-sm font-medium text-gray-700">{tx.asset_symbol}</p>
+                    <p className="text-xs text-gray-500">{tx.transaction_type}</p>
                   </div>
                   <p className={`text-sm font-semibold ${tx.amount.startsWith("+") ? "text-green-600" : "text-red-600"}`}>
                     {tx.amount}
                   </p>
                 </div>
               ))}
+              <Link to="/profile">
               <button className="text-sm text-indigo-600 hover:underline flex items-center gap-1">
                 <FaHistory className="h-3 w-3" /> More
               </button>
+              </Link>
             </div>
             <div className="space-y-4">
               <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">

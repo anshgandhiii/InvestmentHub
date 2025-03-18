@@ -24,7 +24,7 @@ const InvestmentSuggestions = () => {
   const examplePrompts = [
     "My age is 19 and I want an investment plan for 3 years from now to plan my masters in the United States.",
     "Past stock trends/analysis of Microsoft stocks.",
-    "Compare the market performance of Amazon and Snapdeal stocks.",
+    "Compare the market performance of Amazon and Google stocks.",
     "Which is better: SIP or bonds?",
   ]
 

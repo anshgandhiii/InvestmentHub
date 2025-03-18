@@ -36,6 +36,14 @@ function App() {
             }
           />
           <Route
+            path="transaction"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="VirtualMarket"
             element={
               <PrivateRoute>

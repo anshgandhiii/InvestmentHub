@@ -65,10 +65,13 @@ class UserProfileDetail(APIView):
         except UserProfile.DoesNotExist:
             return Response({"error": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        print("Request data:", request.data)  # Debug incoming data
         serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
+            print("Validated data:", serializer.validated_data)  # Debug validated data
             serializer.save()
             return Response(serializer.data)
+        print("Serializer errors:", serializer.errors)  # Debug errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
