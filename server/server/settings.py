@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'account',
     'investments',
     'corsheaders',
-    'agent'
+    'agent',
+    'virtual_market',
 ]
 
 CHANNEL_LAYERS = {

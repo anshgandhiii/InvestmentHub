@@ -74,7 +74,24 @@ class UserProfileDetail(APIView):
         print("Serializer errors:", serializer.errors)  # Debug errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class VirtualProfileView(APIView):
+    def get(self, request, id=None):
+        try:
+            profile = UserProfile.objects.get(user__id=id)
+            serializer = UserProfileSerializer(profile)
+            return Response(serializer.data)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
+    def put(self, request, id=None):
+        try:
+            profile = UserProfile.objects.get(user__id=id)
+            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except UserProfile.DoesNotExist:
+            return Response({"error": "User profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
 

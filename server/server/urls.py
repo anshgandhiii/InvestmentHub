@@ -23,4 +23,5 @@ urlpatterns = [
     path('investment/', include('investments.urls')),
     path('user/', include('account.urls')),
     path('api/finance-agent/', FinanceAgentView.as_view(), name='finance-agent'),
+    path('virtual/', include('virtual_market.urls')),
 ]

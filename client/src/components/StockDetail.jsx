@@ -110,6 +110,7 @@
           {
             user_id: userId,
             asset_symbol: symbol,
+            asset_type: "stock",
             price: stockInfo.price,  // Send current price from stocks.json
             quantity: quantity,
             transaction_type: action,

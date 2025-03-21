@@ -30,4 +30,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['user', 'balance', 'boughtsum', 'stocks', 'bonds', 'insurance', 'risk_tolerance', 'email']
+        fields = ['user', 'balance', 'boughtsum', 'stocks', 'bonds', 'insurance', 'risk_tolerance', 'email', 'virtualbalance', 'virtualboughtsum', 'virtualstocks', 'virtualbonds', 'virtualinsurance']

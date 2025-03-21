@@ -13,6 +13,12 @@ class UserProfile(models.Model):
     bonds = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     insurance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
 
+    virtualbalance = models.DecimalField(max_digits=15, decimal_places=2, default=10000.00)  # Starting virtual balance
+    virtualboughtsum = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    virtualstocks = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    virtualbonds = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    virtualinsurance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+
     def __str__(self):
         return self.user.username
 
